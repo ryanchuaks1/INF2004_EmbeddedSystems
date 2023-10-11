@@ -3,6 +3,8 @@
  * Description: TODO: Add description
  */
 
+#include "movement.h"
+
 /**
  * l298n_speed_pwm_setup()
  * --------
@@ -10,9 +12,6 @@
  * Arguments: None
  * Return: 1 as completed
  */
-
-#include "movement.h"
-
 int l298n_speed_pwm_setup()
 {
     // Tell GPIO 0 and 1 they are allocated to the PWM
@@ -37,12 +36,12 @@ int l298n_speed_pwm_setup()
 /**
  * set_speed()
  * --------
- * Purpose: Set the speed using the PWM for the car to move
- * Arguments: - duty_cycle_left: Percentage of the duty cycle for the left motor
- *            - duty_cycle_left: Percentage of the duty cycle for the right motor
+ * Purpose: Set the speed using the PWM for the car to move. 
+ *          This function makes the car start
+ * Arguments: duty_cycle of the PWM. Range from 0 to 1, 1 being 100%
  * Return: 1 as completed
  */
-int set_speed(uint8_t duty_cycle_left, uint8_t duty_cycle_right)
+int set_speed(float duty_cycle)
 {
     // // Divide the clock by 125Mhz / 200 = 625 000
     pwm_set_clkdiv(SPEED_SLICE_NUM, CLOCK_DIVIDER); 
@@ -52,8 +51,8 @@ int set_speed(uint8_t duty_cycle_left, uint8_t duty_cycle_right)
     pwm_set_wrap(SPEED_SLICE_NUM, WRAP_VALUE);
 
     // // Set the Duty cycle of the PWN signal to be 50% by dividing by 2 on channel A (PWM GPIO 2 is on Channel A)
-    pwm_set_chan_level(SPEED_SLICE_NUM, PWM_CHAN_A, WRAP_VALUE/2);
-    pwm_set_chan_level(SPEED_SLICE_NUM, PWM_CHAN_B, WRAP_VALUE/2);
+    pwm_set_chan_level(SPEED_SLICE_NUM, PWM_CHAN_A, WRAP_VALUE * duty_cycle);
+    pwm_set_chan_level(SPEED_SLICE_NUM, PWM_CHAN_B, WRAP_VALUE * duty_cycle);
 
     pwm_set_enabled(0, true);
 
@@ -96,7 +95,7 @@ void set_right()
     gpio_put(L298N_INPUT_4, 1);
 }
 
-// Stop the car
+// Stops the car
 void set_stop()
 {
     gpio_put(L298N_INPUT_1, 0);
@@ -105,13 +104,13 @@ void set_stop()
     gpio_put(L298N_INPUT_4, 0);
 }
 
-//Sameple Main to run the function (To be Deleted After Submission)
+// Sameple Main to run the function (To be Deleted After Submission)
 // int main() {
 //     stdio_init_all();
     
 //     l298n_speed_pwm_setup();
 
-//     set_speed(0.5, 0.5);
+//     set_speed(0.5);
 
 //     while (1)
 //     {
