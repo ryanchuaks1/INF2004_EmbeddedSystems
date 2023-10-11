@@ -1,5 +1,5 @@
 /*
- * Author:
+ * Author: Ryan Chua
  * Description: Main file for the project
  */
 
