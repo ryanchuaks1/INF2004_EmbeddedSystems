@@ -12,7 +12,6 @@
 #define LEFT_IR_SENSOR_PIN 10
 #define RIGHT_IR_SENSOR_PIN 11
 #define FRONT_IR_SENSOR_PIN 12
-#define WALL_PRESENT_PIN 17
 
 
 enum Direction {
