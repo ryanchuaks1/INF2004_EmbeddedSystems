@@ -33,7 +33,7 @@ int main()
     while (true)
     {
         print_text("Hello, world!\n");
-        check_wallS(); // constantly check walls
+        check_walls(); // constantly check walls
         sleep_ms(100);
     }
 }
