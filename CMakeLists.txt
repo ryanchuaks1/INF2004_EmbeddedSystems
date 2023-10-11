@@ -12,7 +12,13 @@ pico_sdk_init()
 
 # Add your source files to the project
 add_executable(pico_car_project
-    main.c
+    src/main.c
+    src/barcode_recognition.c
+    src/infrared.c
+    src/mapping.c
+    src/movement_control.c
+    src/obstacle_detection.c
+    src/user_interface.c
 )
 
 # Link the Pico SDK libraries to your project
