@@ -25,6 +25,7 @@ add_executable(pico_car_project
 target_link_libraries(pico_car_project
     pico_stdlib
     hardware_pwm
+    hardware_adc
 )
 
 # Enable USB serial output (optional)
