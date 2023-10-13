@@ -14,21 +14,25 @@ void check_walls()
 {
     if (ir_sensor_read(FRONT))
     {
+        printf("Front\n");
         // TODO: stop motors
     }
     if (ir_sensor_read(LEFT))
     {
+        printf("Left\n");
         // TODO: turn right
     }
     if (ir_sensor_read(RIGHT))
     {
-        // TODO: tuen left
+        printf("Right\n");
+        // TODO: turn left
     }
 }
 
 int main()
 {
     stdio_init_all();
+    ir_sensor_init();
 
     while (true)
     {

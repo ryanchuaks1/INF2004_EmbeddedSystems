@@ -9,6 +9,10 @@
 #include "common.h"
 
 #define IR_WALL_THRESHOLD 1000; // Define IR intensity threshold here
+#define LEFT_IR_SENSOR_PIN 10
+#define RIGHT_IR_SENSOR_PIN 11
+#define FRONT_IR_SENSOR_PIN 12
+
 
 enum Direction {
     LEFT,

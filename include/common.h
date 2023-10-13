@@ -10,5 +10,6 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include "pico/stdlib.h"
+#include "hardware/adc.h"
 
 #endif // COMMON_H
