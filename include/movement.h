@@ -30,8 +30,8 @@
 #define CLOCK_DIVIDER 200
 #define WRAP_VALUE 31250
 
-// int l298n_speed_pwm_setup();
-// int set_speed(uint8_t duty_cycle_left, uint8_t duty_cycle_right);
-// void set_forward();
-// void set_backward();
-// void set_left();
+int l298n_speed_pwm_setup();
+int set_speed(float duty_cycle);
+void set_forward();
+void set_backward();
+void set_left();
