@@ -1,3 +1,8 @@
+/*
+ * Author: Leung Wei Jun
+ * Description: TODO: Add description
+ */
+
 #ifndef LINKEDLIST_H
 #define LINKEDLIST_H
 

@@ -1,3 +1,8 @@
+/*
+ * Author: Leung Wei Jun
+ * Description: TODO: Add description
+ */
+
 #ifndef SORTING_H
 #define SORTING_H
 

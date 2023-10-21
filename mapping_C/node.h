@@ -1,3 +1,8 @@
+/*
+ * Author: Leung Wei Jun
+ * Description: TODO: Add description
+ */
+
 #ifndef NODE_H
 #define NODE_H
 
