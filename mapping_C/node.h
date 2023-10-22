@@ -8,10 +8,10 @@
 
 #include "common.h"
 
-#define NORTH 0x1u
-#define SOUTH 0x2u
-#define EAST 0x4u
-#define WEST 0x8u
+#define NORTH 0x8u
+#define SOUTH 0x4u
+#define EAST 0x2u
+#define WEST 0x1u
 
 struct Coordinates{
     uint8_t x;
@@ -22,9 +22,12 @@ struct Node{
     struct Coordinates location;
     uint8_t is_walled;
 
+    // BFS properties
+    bool marked;
+
     // A* properties
     float f_cost;
-    float g_cost;
+    uint8_t g_cost;
     float h_cost;
     struct Node* parent;
 
@@ -45,10 +48,12 @@ void node_init(struct Node* node){
         // 1 1 1 0
         node->is_walled = 0x0u;
 
-        node->f_cost = -1.0f;
-        node->g_cost = -1.0f;
-        node->h_cost = -1.0f;
+        node->f_cost = 0.0f;
+        node->g_cost = 0;
+        node->h_cost = 0.0f;
         node->parent = NULL;
+
+        node->marked = false;
 
         (*node).prev = NULL;
         (*node).next = NULL;

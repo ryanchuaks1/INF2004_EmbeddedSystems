@@ -1,3 +1,8 @@
+/*
+ * Author: Leung Wei Jun
+ * Description: TODO: Add description
+ */
+
 #ifndef PATHFINDING_H
 #define PATHFINDING_H
 
@@ -36,9 +41,9 @@ void sort_f_cost(struct LinkedList* ll){
     ll->tail = curr_node;
 }
 
-float calculate_g_cost(struct Node* curr_node, struct Node* start_node){
+uint8_t calculate_g_cost(struct Node* curr_node, struct Node* start_node){
     struct Node* node = curr_node;
-    float g_cost = 0;
+    uint8_t g_cost = 0;
 
     while (node != start_node){
         g_cost += PATH_COST;
@@ -77,18 +82,24 @@ struct LinkedList* compute_path(struct Node* grid[MAX_ROW][MAX_COL], struct Node
         {
             uint8_t mask = (1 << i);
 
+            // if there's no wall, then this AND operation will result to 0
             if((curr_node->is_walled & mask) == 0){
                 uint8_t pos_x = curr_node->location.x;
                 uint8_t pos_y = curr_node->location.y;
 
+                // check if the mask is currently servicing NORTH or SOUTH walls (which is mask = 8 or mask = 4)
                 if (mask & (NORTH | SOUTH))
                 {
-                    pos_x += (mask % 2) ? -1 : 1;
+                    // if our neighbour is NORTH of us ((8 / 4) % 2 = 0), then the x-coordinate - 1
+                    // if our neighbour is SOUTH of us ((4 / 4) % 2 = 1), then the x-coordinate + 1
+                    pos_x += ((mask >> 2) % 2) ? 1 : -1;
 
                 }
                 else if(mask & (EAST | WEST))
                 {
-                    pos_y += ((mask / 4) % 2) ? 1 : -1;
+                    // if our neighbour is EAST of us (2 % 2 = 0), then the y-coordinate + 1
+                    // if our neighbour is WEST of us (1 % 2 = 1), then the y-coordinate - 1
+                    pos_y += (mask % 2) ? -1 : 1;
                 }
 
                 if(pos_x < MAX_ROW && pos_y < MAX_COL){

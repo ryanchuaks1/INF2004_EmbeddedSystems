@@ -1,6 +1,17 @@
 /*
  * Author: Leung Wei Jun
- * Description: TODO: Add description
+ * Description: LinkedList implementation on C
+ * Functions/Methods:
+ * 1. insertAtHead
+ * 2. insertAtTail
+ * 3. remove_at_head
+ * 4. removeNode
+ * 5. in_ll
+ * 6. find_mid_node
+ * 7. size
+ * 8. isEmpty
+ * 9. ll_init
+ * 10. print_ll
  */
 
 #ifndef LINKEDLIST_H
@@ -44,14 +55,17 @@ void insertAtTail(struct LinkedList* ll, struct Node* newNode){
     (*ll).tail = newNode;
 }
 
-void remove_at_head(struct LinkedList* ll){
+struct Node* remove_at_head(struct LinkedList* ll){
+    struct Node* removed_node = NULL;
     if(ll->head != NULL){
-        struct Node* removed_node = ll->head;
+        removed_node = ll->head;
         ll->head = removed_node->next;
         
         ll->head->prev = NULL;
         removed_node->next = NULL;
     }
+
+    return removed_node;
 }
 
 void removeNode(struct LinkedList* ll, struct Node* node){
@@ -167,7 +181,7 @@ void print_ll(struct LinkedList* ll){
     struct Node* curr_node = ll->head;
     int counter = 1;
     while (curr_node != NULL){
-        printf("Node %d, f_cost=%f g_cost=%f h_cost=%f, location=(%d,%d)\n", counter, curr_node->f_cost, curr_node->g_cost, curr_node->h_cost, curr_node->location.x, curr_node->location.y);
+        printf("Node %d, f_cost=%.2f g_cost=%d h_cost=%.2f, location=(%d,%d)\n", counter, curr_node->f_cost, curr_node->g_cost, curr_node->h_cost, curr_node->location.x, curr_node->location.y);
         curr_node = curr_node->next;
         counter++;
     }
