@@ -1,10 +1,14 @@
 #include "common.h"
 #include "grid.h"
 #include "pathfinding.h"
+#include "mapping.h"
 
 int main(){
     struct Node* grid[MAX_ROW][MAX_COL];
     grid_init(grid);
+
+    struct Node** car_position = (struct Node**)malloc(sizeof(struct Node*));
+    *car_position = grid[START_NODE_X][START_NODE_Y];
 
     add_wall(grid, grid[1][1], NORTH | SOUTH | EAST | WEST);
     add_wall(grid, grid[2][2], NORTH | SOUTH | EAST | WEST);
@@ -21,10 +25,13 @@ int main(){
     // }
     // sort_f_cost(test);
     // print_ll(test);
-    struct LinkedList* path = compute_path(grid, grid[4][4], grid[0][0]);
-    if(path != NULL){
-        print_ll(path);
-    }
-    free(path);
+
+    // struct LinkedList* path = compute_path(grid, grid[4][4], grid[0][0]);
+    // if(path != NULL){
+    //     print_ll(path);
+    // }
+    // free(path);
+
+    discover_map(grid, car_position);
 
 }

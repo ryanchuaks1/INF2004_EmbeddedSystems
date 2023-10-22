@@ -56,14 +56,19 @@ void insertAtTail(struct LinkedList* ll, struct Node* newNode){
 }
 
 struct Node* remove_at_head(struct LinkedList* ll){
-    struct Node* removed_node = NULL;
+    struct Node* removed_node = ll->head;
+
+    ll->head = removed_node->next;
+
     if(ll->head != NULL){
-        removed_node = ll->head;
-        ll->head = removed_node->next;
-        
         ll->head->prev = NULL;
         removed_node->next = NULL;
     }
+    else{
+        ll->tail = NULL;
+    }
+
+
 
     return removed_node;
 }

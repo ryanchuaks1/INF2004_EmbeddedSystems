@@ -9,35 +9,78 @@
 #include "grid.h"
 #include "linkedlist.h"
 
-struct Node* visit_node(struct Node* curr_node, struct Node* node_to_visit){
-    if(curr_node == node_to_visit->parent){
-        //move to current node
-        return node_to_visit;
+struct Node* lowest_common_ancestor(struct LinkedList* path, struct Node* node){
+
+    if(node == path->head){
+        return node;
     }
 
-    struct Node* next_node = visit_node(curr_node, node_to_visit->parent);
+    struct Node* lca_node = lowest_common_ancestor(path, node->parent);
 
-    //TODO: Move to next node
+    if(lca_node != node->parent){
+        insertAtHead(path, node);
+        return lca_node;
+    }
 
-    // if(curr_node == NULL){
-    //     //TODO: move from whatever outside the grid position to the starting node
-    // }
+    else if(in_ll(path, node)){
+        removeNode(path, lca_node);
+        return node;
+    }
 
-    // curr_node->parent = NULL;
+    else{
+        insertAtHead(path, node);
+        return lca_node;
+    }
+    
+
 }
 
-void discover_map(struct Node* grid[MAX_ROW][MAX_COL]){
-    struct LinkedList* queue = (struct LinkedList*)malloc(sizeof(struct LinkedList));
-    struct Node* curr_node = NULL;
+struct LinkedList* generate_path_to_node(struct Node* start_node, struct Node* end_node){
+    struct LinkedList* path = (struct LinkedList*)malloc(sizeof(struct LinkedList));
+    ll_init(path);
+    struct Node* curr_node = end_node;
 
-    grid[START_NODE_X][START_NODE_Y]->marked = true;
-    insertAtTail(queue, grid[START_NODE_X][START_NODE_Y]);
+    while (curr_node->parent != NULL && curr_node != start_node){
+        insertAtHead(path, curr_node);
+        curr_node = curr_node->parent;
+    }
+
+    insertAtHead(path, start_node);
+
+    if(curr_node != start_node){
+        struct Node* lca_node = lowest_common_ancestor(path, start_node);
+    }
+
+    return path;
+}
+
+void visit_node(struct Node** car_position, struct Node* node_to_visit){
+    struct LinkedList* path_to_node = generate_path_to_node(*car_position, node_to_visit);
+    struct Node* starting_node = remove_at_head(path_to_node);
+
+    while(!isEmpty(path_to_node)){
+        struct Node* next_node = remove_at_head(path_to_node);
+        printf("Goal: (%d,%d), traversing from (%d,%d) to (%d,%d)\n",node_to_visit->location.x, node_to_visit->location.y, (*car_position)->location.x, (*car_position)->location.y, next_node->location.x, next_node->location.y);
+        // TODO: move to next node
+        *car_position = next_node;
+    }
+
+    free(path_to_node);
+}
+
+void discover_map(struct Node* grid[MAX_ROW][MAX_COL], struct Node** car_position){
+    struct LinkedList* stack = (struct LinkedList*)malloc(sizeof(struct LinkedList));
+    ll_init(stack);
+
+    insertAtHead(stack, grid[START_NODE_X][START_NODE_Y]);
     
-    while(!isEmpty(queue)){
-        struct Node* node_to_visit = remove_at_head(queue);
+    while(!isEmpty(stack)){
+        //print_ll(stack);
+        struct Node* node_to_visit = remove_at_head(stack);
+        node_to_visit->marked = true;
 
-        visit_node(curr_node, node_to_visit);
-        curr_node = node_to_visit;
+        visit_node(car_position, node_to_visit);
+        // TODO: Check side walls, then turn 45 degrees and check front walls. Add walls using add_wall()
 
         for(uint8_t i = 0; i < 4; i++)
         {
@@ -57,15 +100,22 @@ void discover_map(struct Node* grid[MAX_ROW][MAX_COL]){
                 }
 
                 if(pos_x < MAX_ROW && pos_y < MAX_COL && !(grid[pos_x][pos_y]->marked)){
-                    grid[pos_x][pos_y]->marked = true;
-                    grid[pos_x][pos_y]->parent = node_to_visit;
-                    insertAtTail(queue, grid[pos_x][pos_y]);
+                    struct Node* neighbour_node = grid[pos_x][pos_y];
+                    if(in_ll(stack, neighbour_node)){
+                        removeNode(stack, neighbour_node);
+                    }
+                    //printf("neighbour node: (%d,%d)\n", neighbour_node->location.x, neighbour_node->location.y);
+                    neighbour_node->parent = node_to_visit;
+                    insertAtHead(stack, neighbour_node);
                 }
 
                 node_to_visit->is_walled &= ~mask;
             }
         }
     }
+
+    printf("Successfully mapped the maze.");
+    free(stack);
 }
 
 #endif

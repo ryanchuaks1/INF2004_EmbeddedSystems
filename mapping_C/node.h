@@ -20,6 +20,9 @@ struct Coordinates{
 
 struct Node{
     struct Coordinates location;
+
+    // N S E W
+    // 1 1 1 0
     uint8_t is_walled;
 
     // BFS properties
@@ -44,8 +47,6 @@ void node_init(struct Node* node){
     else{
         node->location.x = 0;
         node->location.y = 0;
-        // N S E W
-        // 1 1 1 0
         node->is_walled = 0x0u;
 
         node->f_cost = 0.0f;
