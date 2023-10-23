@@ -10,10 +10,10 @@ int main(){
     struct Node** car_position = (struct Node**)malloc(sizeof(struct Node*));
     *car_position = grid[START_NODE_X][START_NODE_Y];
 
-    add_wall(grid, grid[1][1], NORTH | SOUTH | EAST | WEST);
-    add_wall(grid, grid[2][2], NORTH | SOUTH | EAST | WEST);
-    add_wall(grid, grid[3][3], NORTH | SOUTH | EAST | WEST);
-    add_wall(grid, grid[0][1], NORTH | SOUTH | EAST | WEST);
+    add_wall(grid, grid[1][1], NORTH | EAST | WEST);
+    add_wall(grid, grid[2][2], NORTH | SOUTH | WEST);
+    add_wall(grid, grid[3][3], NORTH | WEST);
+    add_wall(grid, grid[0][1], SOUTH | EAST | WEST);
 
     print_grid(grid);
 

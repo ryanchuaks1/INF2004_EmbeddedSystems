@@ -45,10 +45,12 @@ struct LinkedList* generate_path_to_node(struct Node* start_node, struct Node* e
         curr_node = curr_node->parent;
     }
 
-    insertAtHead(path, start_node);
-
     if(curr_node != start_node){
+        insertAtHead(path, curr_node);
         struct Node* lca_node = lowest_common_ancestor(path, start_node);
+    }
+    else{
+        insertAtHead(path, start_node);
     }
 
     return path;
