@@ -34,6 +34,8 @@ target_link_libraries(pico_car_project
     pico_stdlib
     hardware_pwm
     hardware_adc
+    hardware_gpio
+    hardware_irq
     
     FreeRTOS-Kernel-Heap4
 )

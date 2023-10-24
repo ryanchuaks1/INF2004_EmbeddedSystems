@@ -11,6 +11,7 @@
 #include <stdbool.h>
 #include "pico/stdlib.h"
 #include "hardware/adc.h"
+#include "hardware/gpio.h"
 
 #include "FreeRTOS.h"
 #include "task.h"
