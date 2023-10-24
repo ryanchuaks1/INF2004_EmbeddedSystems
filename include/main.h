@@ -8,9 +8,11 @@
 
 #include "common.h"
 #include "infrared.h"
+#include "barcode.h"
 
-// Prints text to the serial monitor
 void print_text(const char *str);
 bool check_wall(enum Direction);
+void test_rtos();
+void test_barcode();
 
 #endif // MAIN_H

@@ -21,7 +21,7 @@ include_directories(include)  # Add this line
 # Add your source files to the project
 add_executable(pico_car_project
     src/main.c
-    src/barcode_recognition.c
+    src/barcode.c
     src/infrared.c
     src/mapping.c
     src/movement_control.c

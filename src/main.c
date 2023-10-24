@@ -31,20 +31,32 @@ void check_walls()
 
 void test_rtos()
 {
-    while (true)
+    while (1)
     {
         printf("Hello, world!\n");
         vTaskDelay(1000);
     }
-} 
+}
+
+void test_barcode()
+{
+    barcode_init();
+    while (1)
+    {
+        printf("Barcode: %d\n", read_intensity());
+        vTaskDelay(100);
+    }
+}
 
 int main()
 {
     stdio_init_all();
-    xTaskCreate(test_rtos, "test_rtos", 1024, NULL, 1, NULL);
+    xTaskCreate(test_barcode, "test_barcode", 1024, NULL, 1, NULL);
     vTaskStartScheduler();
 
-    while(1){};
+    while (1)
+    {
+    };
     // ir_sensor_init();
 
     // while (true)
