@@ -72,7 +72,7 @@ void check_front_IR_intensity()
     }
 
     resetChecker++;
-    if (resetChecker > 200)
+    if (resetChecker > 300)
     {
         printf("Reset Occured\n");
         resultCount = 0;

@@ -21,11 +21,11 @@
 #define BARCODE_ADC_CHANNEL 0
 #define ADC_IRQ 0
 
-#define THICK_WHITE 300
-#define THIN_WHITE 1650
+#define THICK_WHITE 320
+#define THIN_WHITE 1700
 
 #define THICK_BLACK 3650
-#define THIN_BLACK 1750
+#define THIN_BLACK 1700
 
 void barcode_init();
 void check_front_IR_intensity();
