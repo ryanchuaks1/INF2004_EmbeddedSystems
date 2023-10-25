@@ -7,75 +7,29 @@
 
 void barcode_init()
 {
+    printf("initializing barcode\n");
     // Initialize the ADC
     adc_init();
     adc_gpio_init(BARCODE_SENSOR_PIN);
     adc_select_input(BARCODE_ADC_CHANNEL);
-    isBlackBar = false;
-    barType = THICK_WHITE_BAR;
+    
+    gpio_set_irq_enabled_with_callback(WALL_SENSOR_PIN, GPIO_IRQ_EDGE_RISE, true, &check_if_wall); // enable rising edge interrupt
 }
 
-void check_front_IR_intensity()
+int get_ir_reading()
 {
-    uint16_t raw_value = adc_read();
-    // printf("%d\n", raw_value);
+    uint16_t reading = adc_read();
+    return reading;
+}
 
-    if (raw_value < THICK_WHITE && barType != THICK_WHITE_BAR)
+void check_if_wall()
+{
+    if (time_us_64() - last_button_press_time > DEBOUNCE_DELAY_MS * 1000)
     {
-        resetChecker = 0;
-        isBlackBar = false;
-        barType = THICK_WHITE_BAR;
-        barResults[resultCount] = THICK_WHITE_BAR;
-        resultCount++;
-        printf("Replaced with thick white\n");
-    }
-    else if (raw_value < THIN_WHITE && isBlackBar && barType != THICK_WHITE_BAR && barType != THIN_WHITE_BAR)
-    {
-        resetChecker = 0;
-        isBlackBar = false;
-        barType = THIN_WHITE_BAR;
-        barResults[resultCount] = THIN_WHITE_BAR;
-        resultCount++;
-        printf("Thin white\n");
-    }
-    else if (raw_value > THICK_BLACK && barType != THICK_BLACK_BAR)
-    {
-        resetChecker = 0;
-        isBlackBar = true;
-        barType = THICK_BLACK_BAR;
-        barResults[resultCount] = THICK_BLACK_BAR;
-        resultCount++;
-        printf("Reaplced with Thick black\n");
-    }
-    else if (raw_value > THIN_BLACK && !isBlackBar && barType != THICK_BLACK_BAR && barType != THIN_BLACK_BAR)
-    {
-        resetChecker = 0;
-        isBlackBar = true;
-        barType = THIN_BLACK_BAR;
-        barResults[resultCount] = THIN_BLACK_BAR;
-        resultCount++;
-        printf("Thin black\n");
-    }
+        barcodeFlags.count++;
+        last_button_press_time = time_us_64(); // update last button press time
 
-    // Check if barcode is complete (for example, after 9 results)
-    if (resultCount == 9)
-    {
-        printf("Barcode: ");
-        for (int i = 0; i < resultCount; i++)
-        {
-            printf("%d", barResults[i]);
-        }
-        printf("\n");
-
-        // Reset resultCount for the next barcode
-        resultCount = 0;
-    }
-
-    resetChecker++;
-    if (resetChecker > 300)
-    {
-        printf("Reset Occured\n");
-        resultCount = 0;
-        resetChecker = 0;
+        printf("Count: %d\n", barcodeFlags.count);
+        printf("Wall detected\n");
     }
 }

@@ -18,30 +18,37 @@
 
 // Define GPIO pin and ADC channel for the "front" IR sensor
 #define BARCODE_SENSOR_PIN 26
+#define WALL_SENSOR_PIN 22
 #define BARCODE_ADC_CHANNEL 0
-#define ADC_IRQ 0
 
-#define THICK_WHITE 320
-#define THIN_WHITE 1700
+#define DEBOUNCE_DELAY_MS 100
 
-#define THICK_BLACK 3650
-#define THIN_BLACK 1700
 
 void barcode_init();
-void check_front_IR_intensity();
+int get_ir_reading();
+void check_if_wall();
 
-enum BarTypeThreshold {
+enum BarType
+{
     THICK_BLACK_BAR,
     THIN_BLACK_BAR,
     THICK_WHITE_BAR,
     THIN_WHITE_BAR
 };
 
-static enum BarTypeThreshold barType = THICK_WHITE_BAR;
-static volatile bool isBlackBar = false;
+struct Flags
+{
+    bool start;
+    bool end;
+    bool black;
+    bool white;
+    bool thick;
+    bool thin;
+    int count;
+};
 
-static int barResults[255];
-static int resultCount = 0;
-static int resetChecker = 0;
+static struct Flags barcodeFlags;
+static enum BarType barType;
+static uint64_t last_button_press_time = 0;
 
 #endif // BARCODE_H

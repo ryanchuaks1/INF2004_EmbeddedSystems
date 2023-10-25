@@ -29,7 +29,7 @@ void check_walls()
     }
 }
 
-void test_rtos(void* pvParameters)
+void test_rtos(void *pvParameters)
 {
     while (1)
     {
@@ -38,22 +38,21 @@ void test_rtos(void* pvParameters)
     }
 }
 
-void test_barcode(void* pvParameters)
+void test_barcode(void *pvParameters)
 {
-    barcode_init();
     while (1)
     {
-        check_front_IR_intensity();
-        vTaskDelay(10);
     }
+    // check_if_wall();
 }
 
 int main()
 {
     stdio_init_all();
+    barcode_init();
+
     xTaskCreate(test_barcode, "test_barcode", 1024, NULL, 1, NULL);
     vTaskStartScheduler();
-    
 
     while (1)
     {
