@@ -1,0 +1,6 @@
+add_subdirectory(motor)
+add_subdirectory(irline)
+add_subdirectory(ultrasonic)
+add_subdirectory(wifi)
+add_subdirectory(encoder)
+add_subdirectory(magnetometer)
