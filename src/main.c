@@ -12,29 +12,32 @@ void print_text(const char *str)
 
 void check_walls()
 {
-    if (ir_sensor_read(FRONT))
-    {
-        printf("Front\n");
-        // TODO: stop motors
-    }
-    if (ir_sensor_read(LEFT))
-    {
-        printf("Left\n");
-        // TODO: turn right
-    }
-    if (ir_sensor_read(RIGHT))
-    {
-        printf("Right\n");
-        // TODO: turn left
-    }
+    printf("%s\n", gpio_get(LEFT_IR_SENSOR_PIN) ? "BLACK" : "WHITE");
+    // if (ir_sensor_read(FRONT))
+    // {
+    //     //printf("Front\n");
+    //     // TODO: stop motors
+    // }
+    // if (ir_sensor_read(LEFT))
+    // {
+    //     //printf("Left\n");
+    //     // TODO: turn right
+    // }
+    // if (ir_sensor_read(RIGHT))
+    // {
+    //     //printf("Right\n");
+    //     // TODO: turn left
+    // }
 }
 
 void test_rtos()
 {
     while (true)
     {
-        printf("Hello, world!\n");
-        vTaskDelay(1000);
+        //printf("Hello, world!\n");
+        vTaskDelay(pdMS_TO_TICKS(1000));
+        ir_sensor_init();
+        check_walls();
     }
 } 
 
