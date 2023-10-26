@@ -1,23 +1,4 @@
-/*
- * Author: Leung Wei Jun
- * Description: TODO: Add description
- */
-
-#ifndef GRID_H
-#define GRID_H
-
-#include "common.h"
-#include "node.h"
-
-#define MAX_ROW 5
-#define MAX_COL 5
-#define WALL_MASK 0x0F
-
-#define START_NODE_X 4
-#define START_NODE_Y 4
-
-#define END_NODE_X 0
-#define END_NODE_Y 0
+#include "../include/grid.h"
 
 void grid_init(struct Node* grid[MAX_ROW][MAX_COL]){
     for(uint8_t i = 0; i < MAX_ROW; i++){
@@ -94,7 +75,3 @@ void add_wall(struct Node* grid[MAX_ROW][MAX_COL], struct Node* node, uint8_t wa
         }
     }
 }
-
-#endif
-
-

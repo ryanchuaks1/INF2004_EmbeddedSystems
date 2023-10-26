@@ -1,12 +1,4 @@
-/*
- * Author: Leung Wei Jun
- * Description: TODO: Add description
- */
-
-#ifndef SORTING_H
-#define SORTING_H
-
-#include "linkedlist.h"
+#include "../include/sorting.h"
 
 struct Node* merge(struct Node* head_node, struct Node* mid_node){
     struct Node* sorted_head_node = NULL;
@@ -82,5 +74,3 @@ struct Node* merge_sort(struct Node* head_node){
 
     return merge(left_head, right_head);
 }
-
-#endif
