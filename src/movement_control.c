@@ -80,8 +80,8 @@ void set_backward()
 // Set the car to turn left
 void set_left()
 {
-    gpio_put(L298N_INPUT_1, 1);
-    gpio_put(L298N_INPUT_2, 0);
+    gpio_put(L298N_INPUT_1, 0);
+    gpio_put(L298N_INPUT_2, 1);
     gpio_put(L298N_INPUT_3, 1);
     gpio_put(L298N_INPUT_4, 0);
 }
@@ -89,8 +89,8 @@ void set_left()
 // Set the car to turn right
 void set_right()
 {
-    gpio_put(L298N_INPUT_1, 0);
-    gpio_put(L298N_INPUT_2, 1);
+    gpio_put(L298N_INPUT_1, 1);
+    gpio_put(L298N_INPUT_2, 0);
     gpio_put(L298N_INPUT_3, 0);
     gpio_put(L298N_INPUT_4, 1);
 }
