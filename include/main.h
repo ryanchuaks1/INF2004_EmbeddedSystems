@@ -16,7 +16,6 @@
 void print_text(const char *str);
 bool check_wall(enum Direction);
 void test_rtos(void *pvParameters);
-void test_barcode(void *pvParameters);
 void map_test();
 
 #endif // MAIN_H

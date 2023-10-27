@@ -38,11 +38,12 @@ void test_rtos(void *pvParameters)
     }
 }
 
-void map_test(){
-    struct Node* grid[MAX_ROW][MAX_COL];
+void map_test()
+{
+    struct Node *grid[MAX_ROW][MAX_COL];
     grid_init(grid);
 
-    struct Node** car_position = (struct Node**)malloc(sizeof(struct Node*));
+    struct Node **car_position = (struct Node **)malloc(sizeof(struct Node *));
     *car_position = grid[START_NODE_X][START_NODE_Y];
 
     add_wall(grid, grid[3][3], SOUTH | EAST);
@@ -58,31 +59,24 @@ void map_test(){
     add_wall(grid, grid[2][1], WEST);
     add_wall(grid, grid[3][1], WEST);
 
-
     bool enabled = false;
 
-    while(true){
+    while (true)
+    {
         vTaskDelay(pdMS_TO_TICKS(10000));
-        if(!enabled){
+        if (!enabled)
+        {
             enabled = true;
             print_grid(grid);
             discover_map(grid, car_position);
-            struct LinkedList* path = compute_path(grid, grid[4][4], grid[0][0]);
-            if(path != NULL){
+            struct LinkedList *path = compute_path(grid, grid[4][4], grid[0][0]);
+            if (path != NULL)
+            {
                 print_ll(path);
             }
             free(path);
         }
     }
-}
-}
-
-void test_barcode(void *pvParameters)
-{
-    while (1)
-    {
-    }
-    // check_if_wall();
 }
 
 int main()
@@ -90,8 +84,8 @@ int main()
     stdio_init_all();
     barcode_init();
 
-    //xTaskCreate(test_barcode, "test_barcode", 1024, NULL, 1, NULL);
-    xTaskCreate(map_test, "map_test", configMINIMAL_STACK_SIZE, NULL, 1, NULL);
+    // xTaskCreate(test_barcode, "test_barcode", 1024, NULL, 1, NULL);
+    // xTaskCreate(map_test, "map_test", configMINIMAL_STACK_SIZE, NULL, 1, NULL);
     vTaskStartScheduler();
 
     while (1)
