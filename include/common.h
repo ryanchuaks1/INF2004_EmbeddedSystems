@@ -9,9 +9,22 @@
 
 #include <stdio.h>
 #include <stdbool.h>
+#include <stdlib.h>
+#include <stdint.h>
+#include <math.h>
 #include "pico/stdlib.h"
 #include "hardware/adc.h"
 #include "hardware/gpio.h"
+
+#define MAX_ROW 5
+#define MAX_COL 5
+#define WALL_MASK 0x0F
+
+#define START_NODE_X 4
+#define START_NODE_Y 4
+
+#define END_NODE_X 0
+#define END_NODE_Y 0
 
 #include "FreeRTOS.h"
 #include "task.h"
