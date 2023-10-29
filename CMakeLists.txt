@@ -32,6 +32,7 @@ add_executable(pico_car_project
     src/movement_control.c
     src/obstacle_detection.c
     src/user_interface.c
+    src/ultrasonic.c
 )
 
 # Link the Pico SDK libraries to your project
@@ -39,6 +40,7 @@ target_link_libraries(pico_car_project
     pico_stdlib
     hardware_pwm
     hardware_adc
+    hardware_gpio
     
     FreeRTOS-Kernel-Heap4
 )
