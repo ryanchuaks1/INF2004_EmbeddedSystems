@@ -23,13 +23,16 @@
 
 #define DEBOUNCE_DELAY_MS 100
 
-#define BARCODE_THRESHOLD 1000
+#define BARCODE_THRESHOLD 1500
+#define BARCODE_CHAR_LIMIT 2
 
 void barcode_init();
 int get_ir_reading();
 void check_if_wall();
 void init_read_barcode();
 void read_barcode();
+void reset_barcode_params();
+void barcode_to_char();
 
 enum BarType
 {
@@ -55,15 +58,7 @@ static int black_bar_times[] = {0, 0, 0, 0, 0}; // Array for black bar times
 static int white_bar_times[] = {0, 0, 0, 0, 0};    // Array for white bar times
 static int bar_index = 0;                          // Index for the current bar
 
-#define BYTE_TO_BINARY_PATTERN "%c%c%c%c%c%c%c%c"
-#define BYTE_TO_BINARY(byte)       \
-    ((byte)&0x80 ? '1' : '0'),     \
-        ((byte)&0x40 ? '1' : '0'), \
-        ((byte)&0x20 ? '1' : '0'), \
-        ((byte)&0x10 ? '1' : '0'), \
-        ((byte)&0x08 ? '1' : '0'), \
-        ((byte)&0x04 ? '1' : '0'), \
-        ((byte)&0x02 ? '1' : '0'), \
-        ((byte)&0x01 ? '1' : '0')
+static char code_39_characters[] = "1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ-. *"; // Array of characters for code 39
+
 
 #endif // BARCODE_H
