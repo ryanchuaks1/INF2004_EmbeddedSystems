@@ -35,27 +35,21 @@ bool ir_sensor_read(enum Direction dir)
             gpio_set_irq_enabled_with_callback(LEFT_IR_SENSOR_PIN, GPIO_IRQ_EDGE_FALL, true, &wall_detected_interrupt_handler);
             return false;
         } else
-        {
             return true;
-        }
         break;
     case RIGHT:
         if (gpio_get(RIGHT_IR_SENSOR_PIN)) {
             gpio_set_irq_enabled_with_callback(RIGHT_IR_SENSOR_PIN, GPIO_IRQ_EDGE_FALL, true, &wall_detected_interrupt_handler);
             return false;
         } else
-        {
             return true;
-        }
         break;
     case FRONT:
         if (gpio_get(FRONT_IR_SENSOR_PIN))  {
             gpio_set_irq_enabled_with_callback(FRONT_IR_SENSOR_PIN, GPIO_IRQ_EDGE_FALL, true, &wall_detected_interrupt_handler);
             return false;
         } else
-        {
             return true;
-        }
         break;
     default:
         return false;

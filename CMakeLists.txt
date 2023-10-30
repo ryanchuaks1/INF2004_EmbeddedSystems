@@ -27,6 +27,7 @@ add_executable(pico_car_project
     src/movement_control.c
     src/obstacle_detection.c
     src/user_interface.c
+    src/magnetometer.c
 )
 
 # Link the Pico SDK libraries to your project
@@ -34,6 +35,7 @@ target_link_libraries(pico_car_project
     pico_stdlib
     hardware_pwm
     hardware_adc
+    hardware_i2c
     
     FreeRTOS-Kernel-Heap4
 )
@@ -49,6 +51,7 @@ target_compile_definitions(pico_car_project PRIVATE
     WIFI_SSID=\"${WIFI_SSID}\"
     WIFI_PASSWORD=\"${WIFI_PASSWORD}\"
 )
+
 
 # Enable USB serial output (optional)
 pico_enable_stdio_usb(pico_car_project 1)
