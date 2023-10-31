@@ -14,6 +14,7 @@
 #include <math.h>
 #include "pico/stdlib.h"
 #include "hardware/adc.h"
+#include "hardware/gpio.h"
 
 #define MAX_ROW 5
 #define MAX_COL 5

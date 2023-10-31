@@ -27,7 +27,7 @@ add_executable(pico_car_project
     src/node.c
     src/pathfinding.c
     src/sorting.c
-    src/barcode_recognition.c
+    src/barcode.c
     src/infrared.c
     src/movement_control.c
     src/obstacle_detection.c
@@ -39,6 +39,8 @@ target_link_libraries(pico_car_project
     pico_stdlib
     hardware_pwm
     hardware_adc
+    hardware_gpio
+    hardware_irq
     
     FreeRTOS-Kernel-Heap4
 )
