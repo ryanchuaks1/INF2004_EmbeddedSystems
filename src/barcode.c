@@ -60,7 +60,7 @@ void check_if_wall()
 
 void init_read_barcode()
 {
-    xTaskCreate(read_barcode, "read_barcode", 2048, NULL, 1, NULL);
+    xTaskCreate(read_barcode, "read_barcode", 1024, NULL, 1, NULL);
 }
 
 void decode_barcode(int black_bar_times[], int white_bar_times[])

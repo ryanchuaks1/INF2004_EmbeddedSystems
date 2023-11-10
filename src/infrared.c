@@ -6,11 +6,10 @@
 #include "../include/infrared.h"
 
 // Declare the interrupt setup function
-void setup_wall_detection_interrupt();
+// void setup_wall_detection_interrupt();
 
 void ir_sensor_init()
 {
-    gpio_init(LEFT_IR_SENSOR_PIN);
     gpio_set_dir(LEFT_IR_SENSOR_PIN, GPIO_IN);
 
     gpio_init(RIGHT_IR_SENSOR_PIN);
@@ -32,29 +31,29 @@ bool ir_sensor_read(enum Direction dir)
     {
     case LEFT:
         if (gpio_get(LEFT_IR_SENSOR_PIN)) {
-            gpio_set_irq_enabled_with_callback(LEFT_IR_SENSOR_PIN, GPIO_IRQ_EDGE_FALL, true, &wall_detected_interrupt_handler);
-            return false;
+            // gpio_set_irq_enabled_with_callback(LEFT_IR_SENSOR_PIN, GPIO_IRQ_EDGE_FALL, true, &wall_detected_interrupt_handler);
+            return true;
         } else
         {
-            return true;
+            return false;
         }
         break;
     case RIGHT:
         if (gpio_get(RIGHT_IR_SENSOR_PIN)) {
-            gpio_set_irq_enabled_with_callback(RIGHT_IR_SENSOR_PIN, GPIO_IRQ_EDGE_FALL, true, &wall_detected_interrupt_handler);
-            return false;
+            // gpio_set_irq_enabled_with_callback(RIGHT_IR_SENSOR_PIN, GPIO_IRQ_EDGE_FALL, true, &wall_detected_interrupt_handler);
+            return true;
         } else
         {
-            return true;
+            return false;
         }
         break;
     case FRONT:
         if (gpio_get(FRONT_IR_SENSOR_PIN))  {
-            gpio_set_irq_enabled_with_callback(FRONT_IR_SENSOR_PIN, GPIO_IRQ_EDGE_FALL, true, &wall_detected_interrupt_handler);
-            return false;
+            // gpio_set_irq_enabled_with_callback(FRONT_IR_SENSOR_PIN, GPIO_IRQ_EDGE_FALL, true, &wall_detected_interrupt_handler);
+            return true;
         } else
         {
-            return true;
+            return false;
         }
         break;
     default:

@@ -35,3 +35,5 @@ int set_speed(float duty_cycle);
 void set_forward();
 void set_backward();
 void set_left();
+void set_right();
+void set_stop();

@@ -10,34 +10,6 @@ void print_text(const char *str)
     printf("%s", str);
 }
 
-void check_walls()
-{
-    if (ir_sensor_read(FRONT))
-    {
-        printf("Front\n");
-        // TODO: stop motors
-    }
-    if (ir_sensor_read(LEFT))
-    {
-        printf("Left\n");
-        // TODO: turn right
-    }
-    if (ir_sensor_read(RIGHT))
-    {
-        printf("Right\n");
-        // TODO: turn left
-    }
-}
-
-void test_rtos(void *pvParameters)
-{
-    while (1)
-    {
-        printf("Hello, world!\n");
-        vTaskDelay(1000);
-    }
-}
-
 void map_test()
 {
     struct Node *grid[MAX_ROW][MAX_COL];
@@ -79,16 +51,77 @@ void map_test()
     }
 }
 
+void mapping()
+{
+    int timePassed = 0;
+    int confidence_count_left_wall = 0;
+    int confidence_count_right_wall = 0;
+    while (true)
+    {
+        movement(NORTH);
+        vTaskDelay(pdMS_TO_TICKS(100));
+        timePassed += 100;
+        
+        ir_sensor_read(LEFT);
+        ir_sensor_read(RIGHT);
+        ir_sensor_read(FRONT);
+        // ultrasonic_read();
+
+        if (timePassed >= 1000)
+        {
+            timePassed = 0; // Reset timePassed
+            // add_walls_to_map()
+            // 
+        }
+    }
+}
+
+void movement(uint8_t direction)
+{
+    switch (direction)
+    {
+    case NORTH:
+        set_forward();
+        set_speed(0.5);
+
+    default:
+        break;
+    }
+}
+
+void big_brain()
+{
+    switch (state)
+    {
+    case IDLE:
+    {
+    }
+    case MOVING:
+    {
+        xTaskCreate(mapping, "mapping", 1024, NULL, 1, NULL);
+    }
+    case ADJUSTING:
+    {
+    }
+    case BARCODE:
+    {
+    }
+    }
+}
+
 int main()
 {
     stdio_init_all();
-    barcode_init();
+    barcode_init();   // Initialise barcode scanner,
+    ir_sensor_init(); // Initialise IR sensors
+    l298n_speed_pwm_setup(); // Initialise PWM for L298N
 
-    // xTaskCreate(test_barcode, "test_barcode", 1024, NULL, 1, NULL);
-    // xTaskCreate(map_test, "map_test", configMINIMAL_STACK_SIZE, NULL, 1, NULL);
+    xTaskCreate(big_brain, "big_brain", 1024, NULL, 0, NULL);
     vTaskStartScheduler();
 
     while (1)
     {
     };
 }
+
+// fdasd
