@@ -29,8 +29,8 @@ add_executable(pico_car_project
     src/sorting.c
     src/barcode.c
     src/infrared.c
-    src/movement_control.c
-    src/obstacle_detection.c
+    src/motor.c
+    src/ultrasonic.c
     src/user_interface.c
     src/magnetometer.c
 )

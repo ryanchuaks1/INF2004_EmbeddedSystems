@@ -2,10 +2,8 @@
  * Author: Joshua Chua
  * Description: TODO: Add description
  */
-#ifndef MOVEMENT_H
-#define MOVEMENT_H
-
-#endif // MOVEMENT_H
+#ifndef MOTOR_H
+#define MOTOR_H
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -38,3 +36,5 @@ void set_backward();
 void set_left();
 void set_right();
 void set_stop();
+
+#endif
