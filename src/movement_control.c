@@ -131,3 +131,16 @@ void set_stop()
         
 //     }
 // }
+
+void motor_task(uint8_t direction)
+{
+    switch (direction)
+    {
+        case NORTH:
+            set_forward();
+            set_speed(0.5);
+
+        default:
+            break;
+    }
+}

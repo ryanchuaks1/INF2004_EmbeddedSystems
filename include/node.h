@@ -8,11 +8,6 @@
 
 #include "common.h"
 
-#define NORTH 0x8u
-#define SOUTH 0x4u
-#define EAST 0x2u
-#define WEST 0x1u
-
 struct Coordinates{
     uint8_t x;
     uint8_t y;
