@@ -12,6 +12,7 @@
 #include "pico/stdlib.h"
 #include "hardware/pwm.h"
 #include "hardware/gpio.h"
+#include "common.h"
 
 // Direction Pins
 #define L298N_INPUT_1 2

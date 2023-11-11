@@ -5,6 +5,55 @@
 
 #include "../include/main.h"
 
+void enter(struct Car* car){
+    switch(car->state){
+        case IDLE:
+            break;
+        case TRANSIT:
+            break;
+        case ADJUST:
+            break;
+        case BARCODE:
+            break;
+    }
+}
+
+void execute(struct Car* car){
+    switch(car->state){
+        case IDLE:
+            break;
+        case TRANSIT:
+            break;
+        case ADJUST:
+            break;
+        case BARCODE:
+            break;
+    }
+}
+
+void exit(struct Car* car){
+    switch(car->state){
+        case IDLE:
+            break;
+        case TRANSIT:
+            break;
+        case ADJUST:
+            break;
+        case BARCODE:
+            break;
+    }
+}
+
+void change_state(struct Car* car, enum PID_STATE next_state){
+    if(car->state != NULL){
+        exit(car);
+    }
+
+    car->state = next_state;
+
+    enter(car);
+}
+
 void print_text(const char *str)
 {
     printf("%s", str);
@@ -51,72 +100,28 @@ void map_test()
     }
 }
 
-void mapping()
+void main_task(void* params)
 {
-    int timePassed = 0;
-    int confidence_count_left_wall = 0;
-    int confidence_count_right_wall = 0;
-    while (true)
-    {
-        movement(NORTH);
-        vTaskDelay(pdMS_TO_TICKS(100));
-        timePassed += 100;
-        
-        ir_sensor_read(LEFT);
-        ir_sensor_read(RIGHT);
-        ir_sensor_read(FRONT);
-        // ultrasonic_read();
+    struct Car* car = (struct Car*)params;
 
-        if (timePassed >= 1000)
-        {
-            timePassed = 0; // Reset timePassed
-            // add_walls_to_map()
-            // 
-        }
-    }
-}
-
-void movement(uint8_t direction)
-{
-    switch (direction)
-    {
-    case NORTH:
-        set_forward();
-        set_speed(0.5);
-
-    default:
-        break;
-    }
-}
-
-void big_brain()
-{
-    switch (state)
-    {
-    case IDLE:
-    {
-    }
-    case MOVING:
-    {
-        xTaskCreate(mapping, "mapping", 1024, NULL, 1, NULL);
-    }
-    case ADJUSTING:
-    {
-    }
-    case BARCODE:
-    {
-    }
+    while(true){
+        execute(car);
     }
 }
 
 int main()
 {
+    struct Car* car = (struct Car*)malloc(sizeof(struct Car));
+    car->state = NULL;
+
+    change_state(car, IDLE);
+
     stdio_init_all();
     barcode_init();   // Initialise barcode scanner,
     ir_sensor_init(); // Initialise IR sensors
     l298n_speed_pwm_setup(); // Initialise PWM for L298N
 
-    xTaskCreate(big_brain, "big_brain", 1024, NULL, 0, NULL);
+    xTaskCreate(main_task, "main_task", configMINIMAL_STACK_SIZE, car, 3, NULL);
     vTaskStartScheduler();
 
     while (1)

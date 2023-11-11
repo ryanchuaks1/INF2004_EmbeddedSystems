@@ -26,6 +26,11 @@
 #define END_NODE_X 0
 #define END_NODE_Y 0
 
+#define NORTH 0x8u
+#define SOUTH 0x4u
+#define EAST 0x2u
+#define WEST 0x1u
+
 #include "FreeRTOS.h"
 #include "task.h"
 

@@ -20,15 +20,19 @@ void map_test();
 void big_brain();
 void mapping();
 
-enum robot_state
+enum PID_STATE
 {
     IDLE,      // Robot is stationary and waiting for next move
-    MOVING,    // Robot is moving
-    ADJUSTING, // Robot is adjusting its position
+    TRANSIT,    // Robot is moving
+    ADJUST, // Robot is adjusting its position
     BARCODE,   // Robot is scanning a barcode
 };
 
+struct Car{
+    enum PID_STATE state;
+    bool enter;
+    bool exit;
+};
 
-static enum robot_state state = IDLE;
 
-#endif // MAIN_H\
+#endif // MAIN_H
