@@ -32,6 +32,7 @@ add_executable(pico_car_project
     src/movement_control.c
     src/obstacle_detection.c
     src/user_interface.c
+    src/magnetometer.c
 )
 
 # Link the Pico SDK libraries to your project
@@ -41,6 +42,7 @@ target_link_libraries(pico_car_project
     hardware_adc
     hardware_gpio
     hardware_irq
+    hardware_i2c
     
     FreeRTOS-Kernel-Heap4
 )
