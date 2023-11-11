@@ -122,6 +122,8 @@ int main()
     l298n_speed_pwm_setup(); // Initialise PWM for L298N
 
     xTaskCreate(main_task, "main_task", configMINIMAL_STACK_SIZE, car, 3, NULL);
+    xTaskCreate(motor_task, "motor_task", configMINIMAL_STACK_SIZE, car, 2, NULL);
+    
     vTaskStartScheduler();
 
     while (1)

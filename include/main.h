@@ -12,7 +12,21 @@
 #include "grid.h"
 #include "pathfinding.h"
 #include "mapping.h"
-#include "movement.h"
+#include "motor.h"
+
+// FreeRTOS only runs on 1 core
+#ifndef RUN_FREERTOS_ON_CORE
+#define RUN_FREERTOS_ON_CORE 0
+#endif
+
+// Priority value, all tasks are set to priority of 1, so round robin is used.
+#define TEMP_TASK_PRIORITY				( tskIDLE_PRIORITY + 1UL )
+#define MOV_AVG_TASK_PRIORITY			( tskIDLE_PRIORITY + 1UL )
+#define PRINT_TASK_PRIORITY				( tskIDLE_PRIORITY + 1UL )
+#define AVG_TASK_PRIORITY				( tskIDLE_PRIORITY + 1UL )
+
+// size of the message buffer
+#define mbaTASK_MESSAGE_BUFFER_SIZE		( 60 )
 
 void print_text(const char *str);
 void check_walls();
