@@ -33,6 +33,7 @@ add_executable(pico_car_project
     src/ultrasonic.c
     src/user_interface.c
     src/magnetometer.c
+    src/wheel_encoder.c
 )
 
 # Link the Pico SDK libraries to your project

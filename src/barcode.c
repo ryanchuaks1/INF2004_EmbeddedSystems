@@ -5,6 +5,10 @@
 
 #include "../include/barcode.h"
 
+void barcode_task(void* params){
+    
+}
+
 void reset_barcode_params()
 {
     barcodeFlags.isPrevBlackBar = false;

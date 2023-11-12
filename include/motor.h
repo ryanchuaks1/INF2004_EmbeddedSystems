@@ -29,6 +29,11 @@
 #define CLOCK_DIVIDER 200
 #define WRAP_VALUE 31250
 
+// struct Motor{
+//     MessageBufferHandle_t* buffer;
+//     TaskHandle_t* task_handler;
+// };
+
 int l298n_speed_pwm_setup();
 int set_speed(float duty_cycle);
 void set_forward();
@@ -36,5 +41,6 @@ void set_backward();
 void set_left();
 void set_right();
 void set_stop();
+void motor_task(void* params);
 
 #endif

@@ -3,7 +3,20 @@
  * Description: TODO: Add description
  */
 
-#include "../include/movement.h"
+#include "../include/motor.h"
+
+void motor_task(void* params)
+{
+    // switch (direction)
+    // {
+    //     case NORTH:
+    //         set_forward();
+    //         set_speed(0.5);
+
+    //     default:
+    //         break;
+    // }
+}
 
 /**
  * l298n_speed_pwm_setup()
@@ -132,15 +145,4 @@ void set_stop()
 //     }
 // }
 
-void motor_task(uint8_t direction)
-{
-    switch (direction)
-    {
-        case NORTH:
-            set_forward();
-            set_speed(0.5);
 
-        default:
-            break;
-    }
-}

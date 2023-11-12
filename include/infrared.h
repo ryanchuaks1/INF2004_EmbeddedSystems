@@ -13,6 +13,10 @@
 #define RIGHT_IR_SENSOR_PIN 20
 #define FRONT_IR_SENSOR_PIN 13
 
+// struct Infrared{
+//     MessageBufferHandle_t* buffer;
+//     TaskHandle_t* task_handler;
+// };
 
 enum Direction {
     LEFT,
@@ -23,5 +27,6 @@ enum Direction {
 void ir_sensor_init();
 bool ir_sensor_read(enum Direction);
 void wall_detected_interrupt_handler();
+void infrared_task(void* params);
 
 #endif // IR_SENSOR_H

@@ -5,6 +5,32 @@
 
 #include "../include/infrared.h"
 
+void infrared_task(void* params)
+{
+    int timePassed = 0;
+    int confidence_count_left_wall = 0;
+    int confidence_count_right_wall = 0;
+    while (true)
+    {
+        //movement(NORTH);
+        vTaskDelay(pdMS_TO_TICKS(100));
+        timePassed += 100;
+        
+        ir_sensor_read(LEFT);
+        ir_sensor_read(RIGHT);
+        ir_sensor_read(FRONT);
+        // ultrasonic_read();
+
+        if (timePassed >= 1000)
+        {
+            timePassed = 0; // Reset timePassed
+            // add_walls_to_map()
+            // 
+        }
+    }
+}
+
+
 // Declare the interrupt setup function
 // void setup_wall_detection_interrupt();
 
@@ -58,30 +84,5 @@ bool ir_sensor_read(enum Direction dir)
         break;
     default:
         return false;
-    }
-}
-
-void ir_wall_task()
-{
-    int timePassed = 0;
-    int confidence_count_left_wall = 0;
-    int confidence_count_right_wall = 0;
-    while (true)
-    {
-        movement(NORTH);
-        vTaskDelay(pdMS_TO_TICKS(100));
-        timePassed += 100;
-        
-        ir_sensor_read(LEFT);
-        ir_sensor_read(RIGHT);
-        ir_sensor_read(FRONT);
-        // ultrasonic_read();
-
-        if (timePassed >= 1000)
-        {
-            timePassed = 0; // Reset timePassed
-            // add_walls_to_map()
-            // 
-        }
     }
 }

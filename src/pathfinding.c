@@ -1,5 +1,9 @@
 #include "../include/pathfinding.h"
 
+void pathfinding_task(void* params){
+    
+}
+
 struct LinkedList* generate_path(struct Node* end_node, struct Node* start_node){
     struct LinkedList* path = (struct LinkedList*)malloc(sizeof(struct LinkedList));
     ll_init(path);

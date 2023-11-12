@@ -4,12 +4,15 @@
  */
 #include "../include/wheel_encoder.h"
 
+void wheel_encoder_task(void* params){
 
-void measure_edges(uint gpio, uint32_t events) {
-        rising_edge_count++;  
 }
 
-void ir_sensor_init()
+void measure_edges(uint gpio, uint32_t events) {
+    encoder_interrupt_count++;  
+}
+
+void wheel_encoder_init()
 {
     gpio_init(SENSOR_GPIO);
     gpio_set_dir(SENSOR_GPIO, GPIO_IN);
@@ -21,9 +24,9 @@ float read_speed(float start_time, float end_time, float* total_distance)
     //Calculate current time in seconds
     float time_seconds = (end_time - start_time) / 1000000;
 
-    float speed_cm_s = (rising_edge_count * DISTANCE_BETWEEN_EDGE) / time_seconds;
+    float speed_cm_s = (encoder_interrupt_count * DISTANCE_BETWEEN_EDGE) / time_seconds;
 
-    float current_distance = (float)(DISTANCE_BETWEEN_EDGE * rising_edge_count);
+    float current_distance = (float)(DISTANCE_BETWEEN_EDGE * encoder_interrupt_count);
 
     *total_distance += current_distance;
 
@@ -31,7 +34,7 @@ float read_speed(float start_time, float end_time, float* total_distance)
     printf("Distance: %.2fcm\n", current_distance);
     printf("Total Distance: %.2fcm\n", *total_distance);
     printf("Speed: %.2f cm/s\n\n", speed_cm_s);
-    rising_edge_count = 0;
+    encoder_interrupt_count = 0;
     return speed_cm_s;
 }
 

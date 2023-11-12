@@ -26,6 +26,7 @@
 #define BARCODE_THRESHOLD 1500
 #define BARCODE_CHAR_LIMIT 2
 
+void barcode_task(void* params);
 void barcode_init();
 int get_ir_reading();
 void check_if_wall();
@@ -46,6 +47,24 @@ struct Flags
     bool isBarcode;
     int count;
     int limitter;
+};
+
+// Use this instead of global variables, then store the address of this into the Component's (void* flags) variable
+struct Barcode_Flags{
+    bool isPrevBlackBar;
+    bool isBarcode;
+    uint8_t count;
+    uint8_t limitter;
+
+    enum BarType barType;
+    uint64_t last_button_press_time;
+    uint16_t coded_barcode;
+    uint64_t decoded_barcode;
+
+    uint8_t black_bar_times[5];
+    uint8_t white_bar_times[5];
+    uint8_t bar_index;
+    char code_39_characters[41];
 };
 
 static struct Flags barcodeFlags;

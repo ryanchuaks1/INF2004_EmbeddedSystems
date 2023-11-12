@@ -4,6 +4,10 @@
  */
 #include "../include/magnetometer.h"
 
+void magnetometer_task(void* params){
+    
+}
+
 void i2c_init_pins()
 {
 

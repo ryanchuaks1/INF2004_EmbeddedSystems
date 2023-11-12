@@ -18,6 +18,6 @@ void sort_f_cost(struct LinkedList* ll);
 uint8_t calculate_g_cost(struct Node* curr_node, struct Node* start_node);
 float calculate_h_cost(struct Node* curr_node, struct Node* end_node);
 struct LinkedList* compute_path(struct Node* grid[MAX_ROW][MAX_COL], struct Node* start_node, struct Node* end_node);
-
+void pathfinding_task(void* params);
 
 #endif

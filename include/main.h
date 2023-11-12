@@ -7,12 +7,19 @@
 #define MAIN_H
 
 #include "common.h"
-#include "infrared.h"
+
 #include "barcode.h"
+#include "infrared.h"
+#include "magnetometer.h"
+#include "motor.h"
+#include "ultrasonic.h"
+#include "wheel_encoder.h"
+
+#include "node.h"
 #include "grid.h"
 #include "pathfinding.h"
 #include "mapping.h"
-#include "motor.h"
+
 
 // FreeRTOS only runs on 1 core
 #ifndef RUN_FREERTOS_ON_CORE
@@ -20,32 +27,33 @@
 #endif
 
 // Priority value, all tasks are set to priority of 1, so round robin is used.
-#define TEMP_TASK_PRIORITY				( tskIDLE_PRIORITY + 1UL )
-#define MOV_AVG_TASK_PRIORITY			( tskIDLE_PRIORITY + 1UL )
-#define PRINT_TASK_PRIORITY				( tskIDLE_PRIORITY + 1UL )
-#define AVG_TASK_PRIORITY				( tskIDLE_PRIORITY + 1UL )
+#define BARCODE_TASK_PRIORITY				    ( tskIDLE_PRIORITY + 1UL )
+#define INFRARED_TASK_PRIORITY			        ( tskIDLE_PRIORITY + 1UL )
+#define MAGNETOMETER_TASK_PRIORITY				( tskIDLE_PRIORITY + 1UL )
+#define MAPPING_TASK_PRIORITY				    ( tskIDLE_PRIORITY + 1UL )
+#define MOTOR_TASK_PRIORITY				        ( tskIDLE_PRIORITY + 1UL )
+#define ULTRASONIC_TASK_PRIORITY				( tskIDLE_PRIORITY + 1UL )
+#define WHEEL_ENCODER_TASK_PRIORITY				( tskIDLE_PRIORITY + 1UL )
 
 // size of the message buffer
 #define mbaTASK_MESSAGE_BUFFER_SIZE		( 60 )
 
-void print_text(const char *str);
-void check_walls();
-void map_test();
-void big_brain();
-void mapping();
+//void print_text(const char *str);
+void state_enter(struct Car* car);
+void state_execute(struct Car* car);
+void state_exit(struct Car* car);
+void change_state(struct Car* car, enum PID_STATE next_state);
+void components_init(struct Component* components[COMPONENTS_COUNT]);
+void component_init(struct Component* component);
+void main_task(void* params);
+void car_init(struct Car* car);
 
 enum PID_STATE
 {
     IDLE,      // Robot is stationary and waiting for next move
     TRANSIT,    // Robot is moving
     ADJUST, // Robot is adjusting its position
-    BARCODE,   // Robot is scanning a barcode
-};
-
-struct Car{
-    enum PID_STATE state;
-    bool enter;
-    bool exit;
+    SCANNING,   // Robot is scanning a barcode
 };
 
 

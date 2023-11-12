@@ -5,6 +5,43 @@
 
 #include "../include/mapping.h"
 
+void mapping_task(void* params)
+{
+    struct Car* car = (struct Car*)params;
+
+    // add_wall(grid, grid[3][3], SOUTH | EAST);
+    // add_wall(grid, grid[2][3], EAST | WEST);
+    // add_wall(grid, grid[1][3], EAST | WEST);
+    // add_wall(grid, grid[0][3], WEST);
+    // add_wall(grid, grid[3][2], WEST | SOUTH);
+    // add_wall(grid, grid[2][2], WEST);
+    // add_wall(grid, grid[1][2], WEST);
+    // add_wall(grid, grid[0][3], WEST);
+    // add_wall(grid, grid[0][1], WEST);
+    // add_wall(grid, grid[1][1], WEST);
+    // add_wall(grid, grid[2][1], WEST);
+    // add_wall(grid, grid[3][1], WEST);
+    
+    bool enabled = false;
+
+    while (true)
+    {
+        vTaskDelay(pdMS_TO_TICKS(10000));
+        if (!enabled)
+        {
+            enabled = true;
+            print_grid(car->grid);
+            discover_map(car->grid, car->position);
+            // struct LinkedList *path = compute_path(car->grid, car->grid[4][4], car->grid[0][0]);
+            // if (path != NULL)
+            // {
+            //     print_ll(path);
+            // }
+            // free(path);
+        }
+    }
+}
+
 struct Node* lowest_common_ancestor(struct LinkedList* path, struct Node* node){
 
     if(node == path->head){
@@ -59,7 +96,6 @@ void visit_node(struct Node** car_position, struct Node* node_to_visit){
     while(!isEmpty(path_to_node)){
         struct Node* next_node = remove_at_head(path_to_node);
         printf("Goal: (%d,%d), traversing from (%d,%d) to (%d,%d)\n",node_to_visit->location.x, node_to_visit->location.y, (*car_position)->location.x, (*car_position)->location.y, next_node->location.x, next_node->location.y);
-        // TODO: move to next node
         *car_position = next_node;
     }
 
