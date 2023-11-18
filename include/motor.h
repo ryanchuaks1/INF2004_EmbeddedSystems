@@ -5,11 +5,7 @@
 #ifndef MOTOR_H
 #define MOTOR_H
 
-#include <stdio.h>
-#include <stdlib.h>
-#include "pico/stdlib.h"
 #include "hardware/pwm.h"
-#include "hardware/gpio.h"
 #include "common.h"
 
 // Direction Pins
@@ -42,5 +38,7 @@ void set_left();
 void set_right();
 void set_stop();
 void motor_task(void* params);
+
+
 
 #endif

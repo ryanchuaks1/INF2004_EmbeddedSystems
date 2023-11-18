@@ -37,6 +37,7 @@
 
 #define COMPONENTS_COUNT 7
 
+
 enum COMPONENT_NAME{
     BARCODE,
     INFRARED,

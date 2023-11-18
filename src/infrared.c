@@ -7,6 +7,7 @@
 
 void infrared_task(void* params)
 {
+    ir_sensor_init(); // Initialise IR sensors
     int timePassed = 0;
     int confidence_count_left_wall = 0;
     int confidence_count_right_wall = 0;

@@ -6,7 +6,7 @@
 #include "../include/barcode.h"
 
 void barcode_task(void* params){
-    
+    barcode_init();   // Initialise barcode scanner,
 }
 
 void reset_barcode_params()

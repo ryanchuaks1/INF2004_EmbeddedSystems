@@ -7,15 +7,30 @@
 
 void motor_task(void* params)
 {
-    // switch (direction)
-    // {
-    //     case NORTH:
-    //         set_forward();
-    //         set_speed(0.5);
+    l298n_speed_pwm_setup(); // Initialise PWM for L298N
+    struct Car* car = (struct Car*)params;
+    float duty_cycle = 0.5;
+    size_t xReceivedBytes;
+    MessageBufferHandle_t buffer = *(car->components[MOTOR]->buffer);
 
-    //     default:
-    //         break;
-    // }
+    while(true){
+        xReceivedBytes = xMessageBufferReceive
+        (
+            buffer,
+            (void*)&duty_cycle,
+            sizeof(duty_cycle),
+            portMAX_DELAY
+        );
+
+        if(xReceivedBytes > 0){
+            printf("Received: %f, Size: %zu\n", duty_cycle, xReceivedBytes);
+            //printf("Setting duty cycle to: %f\n", duty_cycle * 100);
+            set_forward();
+            set_speed(duty_cycle);
+        }
+
+        vTaskDelay(pdMS_TO_TICKS(1000));
+    }
 }
 
 /**

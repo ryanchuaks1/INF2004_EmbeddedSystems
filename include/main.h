@@ -6,7 +6,7 @@
 #ifndef MAIN_H
 #define MAIN_H
 
-#include "common.h"
+//#include "common.h"
 
 #include "barcode.h"
 #include "infrared.h"
@@ -27,6 +27,7 @@
 #endif
 
 // Priority value, all tasks are set to priority of 1, so round robin is used.
+#define MAIN_TASK_PRIORITY				    ( tskIDLE_PRIORITY + 2UL )
 #define BARCODE_TASK_PRIORITY				    ( tskIDLE_PRIORITY + 1UL )
 #define INFRARED_TASK_PRIORITY			        ( tskIDLE_PRIORITY + 1UL )
 #define MAGNETOMETER_TASK_PRIORITY				( tskIDLE_PRIORITY + 1UL )
@@ -47,6 +48,7 @@ void components_init(struct Component* components[COMPONENTS_COUNT]);
 void component_init(struct Component* component);
 void main_task(void* params);
 void car_init(struct Car* car);
+
 
 enum PID_STATE
 {
