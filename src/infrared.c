@@ -4,86 +4,82 @@
  */
 
 #include "../include/infrared.h"
+#define MEASURE_MS 100
 
 void infrared_task(void* params)
 {
-    ir_sensor_init(); // Initialise IR sensors
-    int timePassed = 0;
-    int confidence_count_left_wall = 0;
-    int confidence_count_right_wall = 0;
-    while (true)
-    {
-        //movement(NORTH);
-        vTaskDelay(pdMS_TO_TICKS(100));
-        timePassed += 100;
-        
-        ir_sensor_read(LEFT);
-        ir_sensor_read(RIGHT);
-        ir_sensor_read(FRONT);
-        // ultrasonic_read();
+    struct Sensor_Data* left_sensor = (struct Sensor_Data*)malloc(sizeof(struct Sensor_Data));
+    sensor_data_init(left_sensor);
+    left_sensor->pin = LEFT_IR_SENSOR_PIN;
+    ir_sensor_init(left_sensor->pin);
 
-        if (timePassed >= 1000)
-        {
-            timePassed = 0; // Reset timePassed
-            // add_walls_to_map()
-            // 
+    struct Sensor_Data* right_sensor = (struct Sensor_Data*)malloc(sizeof(struct Sensor_Data));
+    sensor_data_init(right_sensor);
+    right_sensor->pin = RIGHT_IR_SENSOR_PIN;
+    ir_sensor_init(right_sensor->pin);
+
+    bool task_started = false;
+
+    while(true){
+
+        if(!task_started){
+            task_started = true;
+            vTaskDelay(pdMS_TO_TICKS(5000));
+            printf("IR_Sensor measurement started!\n");
+            ir_sensor_enable(left_sensor);
+            ir_sensor_enable(right_sensor);
+            printf("Finised enabling sensor...\n");
+            add_alarm_in_ms(10000, (alarm_callback_t)ir_sensor_disable, left_sensor, false);
+            add_alarm_in_ms(10000, (alarm_callback_t)ir_sensor_disable, right_sensor, false);
+
+            // left_sensor.status[0] = 0;
+            // left_sensor.status[1] = 0;
         }
+
     }
 }
 
-
-// Declare the interrupt setup function
-// void setup_wall_detection_interrupt();
-
-void ir_sensor_init()
-{
-    gpio_set_dir(LEFT_IR_SENSOR_PIN, GPIO_IN);
-
-    gpio_init(RIGHT_IR_SENSOR_PIN);
-    gpio_set_dir(RIGHT_IR_SENSOR_PIN, GPIO_IN);
-
-    gpio_init(FRONT_IR_SENSOR_PIN);
-    gpio_set_dir(FRONT_IR_SENSOR_PIN, GPIO_IN);
+void sensor_data_init(struct Sensor_Data* sensor){
+    sensor->pin = 0;
+    sensor->status[0] = 0;
+    sensor->status[1] = 0;
 }
 
-// Define the interrupt handler here
-void wall_detected_interrupt_handler()
-{
-    printf("Wall detected! Performing actions...\n");
+void sensor_measure(struct repeating_timer *t){
+    struct Sensor_Data* sensor = (struct Sensor_Data*)(t->user_data);
+    printf("Measure result: %d\n", gpio_get(sensor->pin));
+    // if(gpio_get(sensor->pin)){
+    //     printf("incremnting black...\n");
+    //    sensor->status[1] = sensor->status[0] + 1;
+    // }
+    // else{
+    //     printf("incremnting white...\n");
+    //     sensor->status[0] = sensor->status[0] + 1;
+    // }
+    sensor->status[(uint8_t)gpio_get(sensor->pin)]++;
 }
 
-bool ir_sensor_read(enum Direction dir)
+void ir_sensor_init(uint8_t pin)
 {
-    switch (dir)
-    {
-    case LEFT:
-        if (gpio_get(LEFT_IR_SENSOR_PIN)) {
-            // gpio_set_irq_enabled_with_callback(LEFT_IR_SENSOR_PIN, GPIO_IRQ_EDGE_FALL, true, &wall_detected_interrupt_handler);
-            return true;
-        } else
-        {
-            return false;
-        }
-        break;
-    case RIGHT:
-        if (gpio_get(RIGHT_IR_SENSOR_PIN)) {
-            // gpio_set_irq_enabled_with_callback(RIGHT_IR_SENSOR_PIN, GPIO_IRQ_EDGE_FALL, true, &wall_detected_interrupt_handler);
-            return true;
-        } else
-        {
-            return false;
-        }
-        break;
-    case FRONT:
-        if (gpio_get(FRONT_IR_SENSOR_PIN))  {
-            // gpio_set_irq_enabled_with_callback(FRONT_IR_SENSOR_PIN, GPIO_IRQ_EDGE_FALL, true, &wall_detected_interrupt_handler);
-            return true;
-        } else
-        {
-            return false;
-        }
-        break;
-    default:
-        return false;
+    gpio_init(pin);
+    gpio_set_dir(pin, GPIO_IN);
+}
+
+void ir_sensor_enable(struct Sensor_Data* sensor){
+    sensor->status[gpio_get(sensor->pin)]++;
+    add_repeating_timer_ms(-MEASURE_MS, (repeating_timer_callback_t)sensor_measure, (void *)sensor, &(sensor->timer));
+}
+
+int64_t ir_sensor_disable(alarm_id_t id, void* params){
+    struct Sensor_Data* sensor = (struct Sensor_Data*)params;
+    printf("Disabling sensor...\n");
+    bool result = cancel_repeating_timer(&(sensor->timer));
+    if(result){
+        printf("Result of 1 minute of measurement. Black: %d, White: %d\n", sensor->status[1], sensor->status[0]);
     }
+    else{
+        printf("Failed to stop timer\n");
+    }
+
+    return 0;
 }
