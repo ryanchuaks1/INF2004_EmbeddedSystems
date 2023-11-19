@@ -7,7 +7,7 @@
 #define MAIN_H
 
 //#include "common.h"
-
+#include <string.h>
 #include "barcode.h"
 #include "infrared.h"
 #include "magnetometer.h"

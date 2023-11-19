@@ -59,6 +59,8 @@ struct Car{
     enum PID_STATE* state;
     struct Node* grid[MAX_ROW][MAX_COL];
     struct Component* components[COMPONENTS_COUNT];
+    float wheels_ratio;
+    float duty_cycle;
 };
 
 #endif // COMMON_H

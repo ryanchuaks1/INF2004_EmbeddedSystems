@@ -10,14 +10,26 @@
 #define NO_OF_HOLES 20.0
 #define DISTANCE_BETWEEN_EDGE (WHEEL_CIRCUMFERENCE / NO_OF_HOLES)
 #define SENSOR_GPIO 1
+
+#define LEFT_ENCODER_GPIO 2
+#define RIGHT_ENCODER_GPIO 3
+#define CALIBRATION_TIME_MS 5000
+
 //#define MEASURE_TIME 1000000 // 1 second in microseconds
 
 // Use this instead of global variables, then store the address of this into the Component's (void* flags) variable
 struct Wheel_Encoder_Flags{
-    volatile uint8_t rising_edge_count;
+    volatile uint8_t left_rising_edge_count;
+    volatile uint8_t right_rising_edge_count;
 };
 
 volatile static uint8_t encoder_interrupt_count = 0;
+
+volatile static uint8_t left_rising_edge_count = 0;
+volatile static uint8_t right_rising_edge_count = 0;
+
+volatile static uint8_t starting_left_count;
+volatile static uint8_t starting_right_count;
 
 void wheel_encoder_task(void* params);
 void measure_edges(uint gpio, uint32_t events);

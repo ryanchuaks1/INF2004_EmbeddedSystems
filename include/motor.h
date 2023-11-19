@@ -31,13 +31,17 @@
 // };
 
 int l298n_speed_pwm_setup();
-int set_speed(float duty_cycle);
+int set_speed(float duty_cycle, float ratio);
 void set_forward();
 void set_backward();
 void set_left();
 void set_right();
 void set_stop();
 void motor_task(void* params);
+
+int64_t duration_callback(alarm_id_t id, void *user_data);
+
+static bool motor_finish = false;
 
 
 

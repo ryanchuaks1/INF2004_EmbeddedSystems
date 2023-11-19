@@ -19,30 +19,91 @@ void state_enter(struct Car* car){
 }
 
 void state_execute(struct Car* car){
-    float duty_cycle;
     size_t xBytesSent;
-    MessageBufferHandle_t buffer = *(car->components[MOTOR]->buffer);
-    
+    size_t xBytesReceived;
+
+    char* opcode = "";
+    uint16_t duration_ms = 5000;
+
     switch(*(car->state)){
         case IDLE:
-            duty_cycle = 0.5;
-            xBytesSent = xMessageBufferSend
-            (
-                buffer,
-                (void*)&duty_cycle,
-                sizeof(duty_cycle),
-                portMAX_DELAY
-            );
-            printf("Sending: %f, Size: %zu\n", duty_cycle, xBytesSent); 
+            printf("Main Menu. 1 = Change duty cycle, 2 = Calibrate wheels, 3 = Start car\n");
+            char input = getchar();
+            switch(input){
+                case '1':
+                    printf("Enter a number from 0 to 9, where 0 = 10%%, 9 = 100%%\n");
+                    char duty_cycle_input = getchar();
+                    car->duty_cycle = (float)atoi(&duty_cycle_input) / 10;
+                    break;
+                case '2':
+                    starting_left_count = left_rising_edge_count;
+                    starting_right_count = right_rising_edge_count;
+                    
+                    xBytesSent = xMessageBufferSend(
+                        *(car->components[MOTOR]->buffer),
+                        (void*)&duration_ms,
+                        sizeof(duration_ms),
+                        portMAX_DELAY
+                    );
+
+                    vTaskDelay(pdMS_TO_TICKS(duration_ms));
+
+                    xBytesReceived = xMessageBufferReceive(
+                        *(car->components[MOTOR]->buffer),
+                        (void*)&opcode,
+                        sizeof(opcode),
+                        portMAX_DELAY
+                    );
+
+                    if(strcmp(opcode, "FIN")){
+                        car->wheels_ratio = (left_rising_edge_count - starting_left_count) / (right_rising_edge_count - starting_right_count);
+                        printf("Calibration completed. Ratio is: %f\n", car->wheels_ratio);
+                    }
+
+                    // printf("Sending: %f, Size: %zu\n", duty_cycle, xBytesSent);
+                    break;
+                case '3':
+                    printf("Enter 0 to 9, where 0 = 1s, 9 = 10s\n");
+                    char duration_input = getchar();
+                    duration_ms = ((uint16_t)atoi(&duration_input) + 1) * 1000;
+
+                    change_state(car, TRANSIT);
+                    break;
+                default:
+                    printf("Invalid input\n");
+                    break;
+            }
 
             vTaskDelay(pdMS_TO_TICKS(1000));
             break;
         case TRANSIT:
+            xBytesSent = xMessageBufferSend(
+                *(car->components[MOTOR]->buffer),
+                (void*)&duration_ms,
+                sizeof(duration_ms),
+                portMAX_DELAY
+            );
+
+            vTaskDelay(pdMS_TO_TICKS(duration_ms));
+
+            xBytesReceived = xMessageBufferReceive(
+                *(car->components[MOTOR]->buffer),
+                (void*)&opcode,
+                sizeof(opcode),
+                portMAX_DELAY
+            );
+
+            if(strcmp(opcode, "FIN")){
+                printf("Destination reached\n");
+            }
+
+            change_state(car, IDLE);
             break;
         case ADJUST:
             break;
         case SCANNING:
             break;
+        
     }
 }
 
@@ -87,6 +148,8 @@ void car_init(struct Car* car){
         for(uint8_t i = 0; i < COMPONENTS_COUNT; i++){
             car->components[i] = NULL;
         }
+        car->wheels_ratio = 1.0;
+        car->duty_cycle = 0.0;
     }
 }
 
@@ -172,7 +235,7 @@ void vLaunch(struct Car* car){
     xTaskCreate(main_task, "main_task", configMINIMAL_STACK_SIZE, (void *)car, MAIN_TASK_PRIORITY, NULL);
     // xTaskCreate(mapping_task, "mapping_task", configMINIMAL_STACK_SIZE, car, MAPPING_TASK_PRIORITY, car->components[MAPPING]->task_handler);
     xTaskCreate(motor_task, "motor_task", configMINIMAL_STACK_SIZE, (void *)car, MOTOR_TASK_PRIORITY, car->components[MOTOR]->task_handler);
-    // xTaskCreate(wheel_encoder_task, "wheel_encoder_task", configMINIMAL_STACK_SIZE, car, WHEEL_ENCODER_TASK_PRIORITY, car->components[WHEEL_ENCODER]->task_handler);    
+    xTaskCreate(wheel_encoder_task, "wheel_encoder_task", configMINIMAL_STACK_SIZE, (void *)car, WHEEL_ENCODER_TASK_PRIORITY, car->components[WHEEL_ENCODER]->task_handler);    
     // xTaskCreate(barcode_task, "barcode_task", configMINIMAL_STACK_SIZE, car, BARCODE_TASK_PRIORITY, car->components[BARCODE]->task_handler);
     // xTaskCreate(ultrasonic_task, "ultrasonic_task", configMINIMAL_STACK_SIZE, car, ULTRASONIC_TASK_PRIORITY, car->components[ULTRASONIC]->task_handler);
     // xTaskCreate(infrared_task, "infrared_task", configMINIMAL_STACK_SIZE, car, INFRARED_TASK_PRIORITY, car->components[INFRARED]->task_handler);

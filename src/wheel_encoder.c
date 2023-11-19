@@ -5,11 +5,27 @@
 #include "../include/wheel_encoder.h"
 
 void wheel_encoder_task(void* params){
+    wheel_encoder_init();
+
+    struct Car* car = (struct Car*)params;
+
+    size_t xBytesReceived;
+    size_t xBytesSent;
+
+    while(true){
+
+    }
 
 }
 
 void measure_edges(uint gpio, uint32_t events) {
-    encoder_interrupt_count++;  
+    if(gpio == LEFT_ENCODER_GPIO){
+        left_rising_edge_count++;
+    }
+    else if (gpio == RIGHT_ENCODER_GPIO){
+        right_rising_edge_count++;
+    }
+    encoder_interrupt_count++;
 }
 
 void wheel_encoder_init()
