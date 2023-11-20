@@ -26,7 +26,7 @@
 #endif
 
 // Priority value, all tasks are set to priority of 1, so round robin is used.
-#define MAIN_TASK_PRIORITY				    ( tskIDLE_PRIORITY + 2UL )
+#define MAIN_TASK_PRIORITY				        ( tskIDLE_PRIORITY + 2UL )
 #define BARCODE_TASK_PRIORITY				    ( tskIDLE_PRIORITY + 1UL )
 #define INFRARED_TASK_PRIORITY			        ( tskIDLE_PRIORITY + 1UL )
 #define MAGNETOMETER_TASK_PRIORITY				( tskIDLE_PRIORITY + 1UL )
