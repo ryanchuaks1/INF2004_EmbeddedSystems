@@ -4,6 +4,9 @@
  */
 #include "../include/wheel_encoder.h"
 
+uint16_t left_rising_edge_count;
+uint16_t right_rising_edge_count;
+
 void wheel_encoder_task(void* params){
     wheel_encoder_init();
 
@@ -12,8 +15,9 @@ void wheel_encoder_task(void* params){
     size_t xBytesReceived;
     size_t xBytesSent;
 
+    printf("Wheel encoder initialized\n");
     while(true){
-
+        vTaskDelay(pdMS_TO_TICKS(1000));
     }
 
 }
@@ -30,9 +34,15 @@ void measure_edges(uint gpio, uint32_t events) {
 
 void wheel_encoder_init()
 {
-    gpio_init(SENSOR_GPIO);
-    gpio_set_dir(SENSOR_GPIO, GPIO_IN);
-    gpio_set_irq_enabled_with_callback(SENSOR_GPIO, GPIO_IRQ_EDGE_RISE, true, &measure_edges);
+    gpio_init(LEFT_ENCODER_GPIO);
+    gpio_set_dir(LEFT_ENCODER_GPIO, GPIO_IN);
+    gpio_set_irq_enabled_with_callback(LEFT_ENCODER_GPIO, GPIO_IRQ_EDGE_RISE, true, &measure_edges);
+    left_rising_edge_count = 0;
+    
+    gpio_init(RIGHT_ENCODER_GPIO);
+    gpio_set_dir(RIGHT_ENCODER_GPIO, GPIO_IN);
+    gpio_set_irq_enabled_with_callback(RIGHT_ENCODER_GPIO, GPIO_IRQ_EDGE_RISE, true, &measure_edges);
+    right_rising_edge_count = 0;
 }
 
 float read_speed(float start_time, float end_time, float* total_distance)

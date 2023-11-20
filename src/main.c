@@ -5,6 +5,8 @@
 
 #include "../include/main.h"
 
+
+
 void state_enter(struct Car* car){
     switch(*(car->state)){
         case IDLE:
@@ -23,7 +25,10 @@ void state_execute(struct Car* car){
     size_t xBytesReceived;
 
     char* opcode = "";
-    uint16_t duration_ms = 5000;
+    static uint16_t duration_ms = 10000;
+
+    uint16_t starting_left_count;
+    uint16_t starting_right_count;
 
     switch(*(car->state)){
         case IDLE:
@@ -55,8 +60,10 @@ void state_execute(struct Car* car){
                         portMAX_DELAY
                     );
 
-                    if(strcmp(opcode, "FIN")){
-                        car->wheels_ratio = (left_rising_edge_count - starting_left_count) / (right_rising_edge_count - starting_right_count);
+                    if(strcmp(opcode, "FIN") == 0){
+                        car->wheels_ratio = (float)(left_rising_edge_count - starting_left_count) / (float)(right_rising_edge_count - starting_right_count);
+                        printf("Left count: %d\n", (left_rising_edge_count - starting_left_count));
+                        printf("Right count: %d\n", (right_rising_edge_count - starting_right_count));
                         printf("Calibration completed. Ratio is: %f\n", car->wheels_ratio);
                     }
 
@@ -77,6 +84,9 @@ void state_execute(struct Car* car){
             vTaskDelay(pdMS_TO_TICKS(1000));
             break;
         case TRANSIT:
+            starting_left_count = left_rising_edge_count;
+            starting_right_count = right_rising_edge_count;
+
             xBytesSent = xMessageBufferSend(
                 *(car->components[MOTOR]->buffer),
                 (void*)&duration_ms,
@@ -93,8 +103,11 @@ void state_execute(struct Car* car){
                 portMAX_DELAY
             );
 
-            if(strcmp(opcode, "FIN")){
+            if(strcmp(opcode, "FIN") == 0){
                 printf("Destination reached\n");
+                printf("Left count: %d\n", (left_rising_edge_count - starting_left_count));
+                printf("Right count: %d\n", (right_rising_edge_count - starting_right_count));
+
             }
 
             change_state(car, IDLE);

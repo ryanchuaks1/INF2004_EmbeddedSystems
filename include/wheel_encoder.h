@@ -11,8 +11,8 @@
 #define DISTANCE_BETWEEN_EDGE (WHEEL_CIRCUMFERENCE / NO_OF_HOLES)
 #define SENSOR_GPIO 1
 
-#define LEFT_ENCODER_GPIO 2
-#define RIGHT_ENCODER_GPIO 3
+#define LEFT_ENCODER_GPIO 9
+#define RIGHT_ENCODER_GPIO 13
 #define CALIBRATION_TIME_MS 5000
 
 //#define MEASURE_TIME 1000000 // 1 second in microseconds
@@ -25,11 +25,8 @@ struct Wheel_Encoder_Flags{
 
 volatile static uint8_t encoder_interrupt_count = 0;
 
-volatile static uint8_t left_rising_edge_count = 0;
-volatile static uint8_t right_rising_edge_count = 0;
-
-volatile static uint8_t starting_left_count;
-volatile static uint8_t starting_right_count;
+extern uint16_t left_rising_edge_count;
+extern uint16_t right_rising_edge_count;
 
 void wheel_encoder_task(void* params);
 void measure_edges(uint gpio, uint32_t events);

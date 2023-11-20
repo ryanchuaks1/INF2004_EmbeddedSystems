@@ -25,7 +25,7 @@ void motor_task(void* params)
         );
 
         if(xReceivedBytes > 0){
-            printf("Received: %f, Size: %zu\n", duration_ms, xReceivedBytes);
+            printf("Received: %d, Size: %zu\n", duration_ms, xReceivedBytes);
             set_forward();
             set_speed(car->duty_cycle, car->wheels_ratio);
             add_alarm_in_ms(duration_ms, duration_callback, car, false);
@@ -102,8 +102,22 @@ int set_speed(float duty_cycle, float ratio)
     pwm_set_wrap(SPEED_SLICE_NUM, WRAP_VALUE);
 
     // // Set the Duty cycle of the PWN signal to be 50% by dividing by 2 on channel A (PWM GPIO 2 is on Channel A)
-    pwm_set_chan_level(SPEED_SLICE_NUM, PWM_CHAN_A, WRAP_VALUE * duty_cycle * ratio);
-    pwm_set_chan_level(SPEED_SLICE_NUM, PWM_CHAN_B, WRAP_VALUE * duty_cycle);
+
+    if(ratio > 1){
+        //left wheel = Channel A (ENA)
+        //right wheel = Channel B (ENB)
+        pwm_set_chan_level(SPEED_SLICE_NUM, PWM_CHAN_A, WRAP_VALUE * duty_cycle * (1 / ratio));
+        pwm_set_chan_level(SPEED_SLICE_NUM, PWM_CHAN_B, WRAP_VALUE * duty_cycle);
+    }
+    else if (ratio < 1){
+        pwm_set_chan_level(SPEED_SLICE_NUM, PWM_CHAN_A, WRAP_VALUE * duty_cycle);
+        pwm_set_chan_level(SPEED_SLICE_NUM, PWM_CHAN_B, WRAP_VALUE * duty_cycle * ratio);
+    }
+    else{
+        printf("Calibrating\n");
+        pwm_set_chan_level(SPEED_SLICE_NUM, PWM_CHAN_A, WRAP_VALUE * duty_cycle);
+        pwm_set_chan_level(SPEED_SLICE_NUM, PWM_CHAN_B, WRAP_VALUE * duty_cycle);
+    }
 
     pwm_set_enabled(0, true);
 
