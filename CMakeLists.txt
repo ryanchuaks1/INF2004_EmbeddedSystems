@@ -11,6 +11,7 @@ include(${FREERTOS_KERNEL_PATH}/portable/ThirdParty/GCC/RP2040/FreeRTOS_Kernel_i
 project(pico_car_project C CXX ASM)
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_CXX_STANDARD 17)
+set(PICO_BOARD pico_w)
 
 # Initialize the SDK
 pico_sdk_init()

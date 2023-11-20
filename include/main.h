@@ -47,6 +47,7 @@ void components_init(struct Component* components[COMPONENTS_COUNT]);
 void component_init(struct Component* component);
 void main_task(void* params);
 void car_init(struct Car* car);
+void set_direction(enum DIRECTION dir);
 
 
 enum PID_STATE

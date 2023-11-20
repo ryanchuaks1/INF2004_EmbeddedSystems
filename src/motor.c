@@ -141,6 +141,39 @@ int set_speed(float duty_cycle, float ratio)
     return 1;
 }
 
+void set_direction(enum DIRECTION dir){
+    switch(dir){
+        case FORWARD:
+            printf("Forward...\n");
+            gpio_put(L298N_INPUT_1, 1);
+            gpio_put(L298N_INPUT_2, 0);
+            gpio_put(L298N_INPUT_3, 1);
+            gpio_put(L298N_INPUT_4, 0);
+            break;
+        case BACKWARD:
+            printf("Backward...\n");
+            gpio_put(L298N_INPUT_1, 0);
+            gpio_put(L298N_INPUT_2, 1);
+            gpio_put(L298N_INPUT_3, 0);
+            gpio_put(L298N_INPUT_4, 1);
+            break;
+        case LEFT:
+            printf("Left...\n");
+            gpio_put(L298N_INPUT_1, 0);
+            gpio_put(L298N_INPUT_2, 1);
+            gpio_put(L298N_INPUT_3, 1);
+            gpio_put(L298N_INPUT_4, 0);
+            break;
+        case RIGHT:
+            printf("Right...\n");
+            gpio_put(L298N_INPUT_1, 1);
+            gpio_put(L298N_INPUT_2, 0);
+            gpio_put(L298N_INPUT_3, 0);
+            gpio_put(L298N_INPUT_4, 1);
+            break;
+    }
+}
+
 // Set the car to run forward
 void set_forward()
 {
