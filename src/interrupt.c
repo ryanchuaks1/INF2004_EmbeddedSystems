@@ -14,8 +14,6 @@ void interrupt_callback(uint gpio, uint32_t events)
     }
     else if(gpio == WALL_SENSOR_PIN && events == GPIO_IRQ_EDGE_RISE)
     {
-        printf("Interrupted\n");
-
-        check_if_wall(false);
+        check_if_wall();
     }
 }

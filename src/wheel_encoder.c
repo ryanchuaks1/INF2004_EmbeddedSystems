@@ -15,8 +15,17 @@ void wheel_encoder_task(void* params){
     size_t xBytesReceived;
     size_t xBytesSent;
 
+    uint8_t turn_interrupt_count = 0;
+
     printf("Wheel encoder initialized\n");
     while(true){
+        // xBytesReceived = xMessageBufferReceive(
+        //     *(car->main_buffer),
+        //     (void*)&turn_interrupt_count,
+        //     sizeof(turn_interrupt_count),
+        //     portMAX_DELAY
+        // );
+
         vTaskDelay(pdMS_TO_TICKS(1000));
     }
 

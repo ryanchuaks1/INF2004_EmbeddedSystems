@@ -30,7 +30,8 @@ void barcode_task(void* params);
 void barcode_init();
 void check_if_wall();
 void init_read_barcode();
-void read_barcode();
+void decode_barcode(int black_bar_times[], int white_bar_times[]);
+//void read_barcode();
 void reset_barcode_params();
 void barcode_to_char();
 
