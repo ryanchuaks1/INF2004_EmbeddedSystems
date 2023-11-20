@@ -65,4 +65,6 @@ struct Car{
     MessageBufferHandle_t* main_buffer;
 };
 
+void interrupt_callback(uint gpio, uint32_t events) ;
+
 #endif // COMMON_H
