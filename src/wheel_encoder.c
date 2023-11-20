@@ -22,26 +22,26 @@ void wheel_encoder_task(void* params){
 
 }
 
-void measure_edges(uint gpio, uint32_t events) {
-    if(gpio == LEFT_ENCODER_GPIO){
-        left_rising_edge_count++;
-    }
-    else if (gpio == RIGHT_ENCODER_GPIO){
-        right_rising_edge_count++;
-    }
-    encoder_interrupt_count++;
-}
+// void measure_edges(uint gpio, uint32_t events) {
+//     if(gpio == LEFT_ENCODER_GPIO){
+//         left_rising_edge_count++;
+//     }
+//     else if (gpio == RIGHT_ENCODER_GPIO){
+//         right_rising_edge_count++;
+//     }
+//     encoder_interrupt_count++;
+// }
 
 void wheel_encoder_init()
 {
     gpio_init(LEFT_ENCODER_GPIO);
     gpio_set_dir(LEFT_ENCODER_GPIO, GPIO_IN);
-    gpio_set_irq_enabled_with_callback(LEFT_ENCODER_GPIO, GPIO_IRQ_EDGE_RISE, true, &measure_edges);
+    gpio_set_irq_enabled_with_callback(LEFT_ENCODER_GPIO, GPIO_IRQ_EDGE_RISE, true, &interrupt_callback);
     left_rising_edge_count = 0;
     
     gpio_init(RIGHT_ENCODER_GPIO);
     gpio_set_dir(RIGHT_ENCODER_GPIO, GPIO_IN);
-    gpio_set_irq_enabled_with_callback(RIGHT_ENCODER_GPIO, GPIO_IRQ_EDGE_RISE, true, &measure_edges);
+    gpio_set_irq_enabled_with_callback(RIGHT_ENCODER_GPIO, GPIO_IRQ_EDGE_RISE, true, &interrupt_callback);
     right_rising_edge_count = 0;
 }
 

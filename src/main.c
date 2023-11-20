@@ -5,6 +5,8 @@
 
 #include "../include/main.h"
 
+struct Car* global_car;
+
 void state_enter(struct Car* car){
     switch(*(car->state)){
         case IDLE:
@@ -110,7 +112,10 @@ void state_execute(struct Car* car){
                 pdMS_TO_TICKS(duration_ms)
             );
 
+            printf("Opcode: %s\n", opcode);
+
             if(strcmp(opcode, "IR_IRQ") == 0){
+                printf("Hello\n");
                 duration_ms -= (time_us_32() - start_time_us) / 1000;
                 change_state(car, SCANNING);
             }
@@ -120,10 +125,15 @@ void state_execute(struct Car* car){
                 change_state(car, IDLE);
             }
 
+            else{
+                printf("Error occured\n");
+            }
+
             break;
         case ADJUST:
             break;
         case SCANNING:
+            vTaskDelay(pdMS_TO_TICKS(1000));
             break;
         
     }
@@ -231,7 +241,7 @@ void main_task(void* params)
 {
     struct Car* car = (struct Car*)params;
     change_state(car, IDLE);
-    printf("Message buffer address from main_task: %p\n", car->components[MOTOR]->buffer);
+    printf("Message buffer address from main_task: %p\n", car->main_buffer);
     while(true){
         state_execute(car);
     }
@@ -276,6 +286,7 @@ int main()
 
     struct Car* car = (struct Car*)malloc(sizeof(struct Car));
     car_init(car);
+    global_car = car;
     grid_init(car->grid);
     components_init(car->components);
 

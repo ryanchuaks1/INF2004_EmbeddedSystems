@@ -66,6 +66,7 @@ struct Car{
 };
 
 void interrupt_callback(uint gpio, uint32_t events);
+extern struct Car* global_car;
 
 enum DIRECTION{
     FORWARD,
