@@ -5,6 +5,8 @@
 
 #include "../include/main.h"
 
+struct Car* global_car;
+
 void state_enter(struct Car* car){
     switch(*(car->state)){
         case IDLE:
@@ -113,12 +115,12 @@ void state_execute(struct Car* car){
                 portMAX_DELAY
             );
 
-            xBytesSent = xMessageBufferSend(
-                *(car->components[MOTOR]->buffer),
-                (void*)&duration_ms,
-                sizeof(duration_ms),
-                portMAX_DELAY
-            );
+            // xBytesSent = xMessageBufferSend(
+            //     *(car->components[MOTOR]->buffer),
+            //     (void*)&duration_ms,
+            //     sizeof(duration_ms),
+            //     portMAX_DELAY
+            // );
 
             xMessageBufferReceive
             (
@@ -128,7 +130,10 @@ void state_execute(struct Car* car){
                 pdMS_TO_TICKS(duration_ms)
             );
 
+            printf("Opcode: %s\n", opcode);
+
             if(strcmp(opcode, "IR_IRQ") == 0){
+                printf("Hello\n");
                 duration_ms -= (time_us_32() - start_time_us) / 1000;
                 change_state(car, SCANNING);
             }
@@ -138,10 +143,15 @@ void state_execute(struct Car* car){
                 change_state(car, IDLE);
             }
 
+            else{
+                printf("Error occured\n");
+            }
+
             break;
         case ADJUST:
             break;
         case SCANNING:
+            vTaskDelay(pdMS_TO_TICKS(1000));
             break;
         
     }
@@ -249,7 +259,7 @@ void main_task(void* params)
 {
     struct Car* car = (struct Car*)params;
     change_state(car, IDLE);
-    printf("Message buffer address from main_task: %p\n", car->components[MOTOR]->buffer);
+    printf("Message buffer address from main_task: %p\n", car->main_buffer);
     while(true){
         state_execute(car);
     }
@@ -281,7 +291,7 @@ void vLaunch(struct Car* car){
     xTaskCreate(wheel_encoder_task, "wheel_encoder_task", configMINIMAL_STACK_SIZE, (void *)car, WHEEL_ENCODER_TASK_PRIORITY, car->components[WHEEL_ENCODER]->task_handler);    
     xTaskCreate(barcode_task, "barcode_task", configMINIMAL_STACK_SIZE, car, BARCODE_TASK_PRIORITY, car->components[BARCODE]->task_handler);
     // xTaskCreate(ultrasonic_task, "ultrasonic_task", configMINIMAL_STACK_SIZE, car, ULTRASONIC_TASK_PRIORITY, car->components[ULTRASONIC]->task_handler);
-    xTaskCreate(infrared_task, "infrared_task", configMINIMAL_STACK_SIZE, car, INFRARED_TASK_PRIORITY, car->components[INFRARED]->task_handler);
+    //xTaskCreate(infrared_task, "infrared_task", configMINIMAL_STACK_SIZE, car, INFRARED_TASK_PRIORITY, car->components[INFRARED]->task_handler);
     // xTaskCreate(magnetometer_task, "magnetometer_task", configMINIMAL_STACK_SIZE, car, MAGNETOMETER_TASK_PRIORITY, car->components[MAGNETOMETER]->task_handler);
     vTaskStartScheduler();
 }
@@ -294,6 +304,7 @@ int main()
 
     struct Car* car = (struct Car*)malloc(sizeof(struct Car));
     car_init(car);
+    global_car = car;
     grid_init(car->grid);
     components_init(car->components);
 

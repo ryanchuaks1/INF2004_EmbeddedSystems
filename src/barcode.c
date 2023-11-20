@@ -42,23 +42,25 @@ void barcode_init()
     gpio_set_irq_enabled_with_callback(WALL_SENSOR_PIN, GPIO_IRQ_EDGE_RISE, true, &interrupt_callback); // enable rising edge interrupt
 }
 
-void check_if_wall(char isAlarm)
+void alarm_callback()
 {
-    if (isAlarm == true)
+    if (barcodeFlags.isBarcode == false)
     {
-        printf("WALL DETECTED\n");
+        printf("Wall detected please reverse robot\n");
     }
+}
+
+void check_if_wall()
+{
     if (time_us_64() - last_button_press_time > DEBOUNCE_DELAY_MS * 1000)
     {
         barcodeFlags.count++;
         last_button_press_time = time_us_64(); // update last button press time
+        last_wall_time = time_us_64();         // update last wall time
+        add_alarm_in_ms(1000, (alarm_callback_t)alarm_callback, NULL, false);
 
-        add_alarm_in_ms(10000, (alarm_callback_t)check_if_wall, true, false);
         if (barcodeFlags.count > 1) // When wall is detected
         {
-            // Disable the alarm
-            cancel_alarm((alarm_id_t)check_if_wall);
-
             // Disable interrupt and set flag
             gpio_set_irq_enabled_with_callback(WALL_SENSOR_PIN, GPIO_IRQ_EDGE_RISE, false, &interrupt_callback); // enable rising edge interrupt
             barcodeFlags.isBarcode = true;
@@ -194,6 +196,13 @@ void barcode_to_char(int black_bar_times[], int white_bar_times[])
 
 void read_barcode()
 {
+    char *message = "IR_IRQ";
+    xMessageBufferSend(
+        *(global_car->main_buffer),
+        (void *)&message,
+        sizeof(message),
+        0);
+        
     vTaskDelay(pdMS_TO_TICKS(1000));
     while (barcodeFlags.isBarcode)
     {

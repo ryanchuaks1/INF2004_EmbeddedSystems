@@ -28,8 +28,7 @@
 
 void barcode_task(void* params);
 void barcode_init();
-int get_ir_reading();
-void check_if_wall(char isAlarm);
+void check_if_wall();
 void init_read_barcode();
 void read_barcode();
 void reset_barcode_params();
@@ -57,7 +56,7 @@ struct Barcode_Flags{
     uint8_t limitter;
 
     enum BarType barType;
-    uint64_t last_button_press_time;
+    uint64_t last_wall_time;
     uint16_t coded_barcode;
     uint64_t decoded_barcode;
 
@@ -70,6 +69,7 @@ struct Barcode_Flags{
 static struct Flags barcodeFlags;
 static enum BarType barType;
 static uint64_t last_button_press_time = 0;
+static uint64_t last_wall_time = 0;
 static uint16_t coded_barcode = 0;
 static uint64_t decoded_barcode = 0;
 
