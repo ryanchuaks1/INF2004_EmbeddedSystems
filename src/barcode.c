@@ -5,10 +5,12 @@
 
 #include "../include/barcode.h"
 
-void barcode_task(void* params){
-    barcode_init();   // Initialise barcode scanner,
+void barcode_task(void *params)
+{
+    barcode_init(); // Initialise barcode scanner,
 
-    while(true){
+    while (true)
+    {
         vTaskDelay(pdMS_TO_TICKS(1000));
     }
 }
@@ -24,7 +26,7 @@ void reset_barcode_params()
     coded_barcode = 0;
     decoded_barcode = 0;
     bar_index = 0;
-    gpio_set_irq_enabled_with_callback(WALL_SENSOR_PIN, GPIO_IRQ_EDGE_RISE, true, &check_if_wall); // enable rising edge interrupt
+    gpio_set_irq_enabled_with_callback(WALL_SENSOR_PIN, GPIO_IRQ_EDGE_RISE, true, &interrupt_callback); // enable rising edge interrupt
 }
 
 void barcode_init()
@@ -37,26 +39,28 @@ void barcode_init()
 
     reset_barcode_params();
 
-    gpio_set_irq_enabled_with_callback(WALL_SENSOR_PIN, GPIO_IRQ_EDGE_RISE, true, &check_if_wall); // enable rising edge interrupt
+    gpio_set_irq_enabled_with_callback(WALL_SENSOR_PIN, GPIO_IRQ_EDGE_RISE, true, &interrupt_callback); // enable rising edge interrupt
 }
 
-int get_ir_reading()
+void check_if_wall(char isAlarm)
 {
-    uint16_t reading = adc_read();
-    return reading;
-}
-
-void check_if_wall()
-{
+    if (isAlarm == true)
+    {
+        printf("WALL DETECTED\n");
+    }
     if (time_us_64() - last_button_press_time > DEBOUNCE_DELAY_MS * 1000)
     {
         barcodeFlags.count++;
         last_button_press_time = time_us_64(); // update last button press time
 
+        add_alarm_in_ms(10000, (alarm_callback_t)check_if_wall, true, false);
         if (barcodeFlags.count > 1) // When wall is detected
         {
+            // Disable the alarm
+            cancel_alarm((alarm_id_t)check_if_wall);
+
             // Disable interrupt and set flag
-            gpio_set_irq_enabled_with_callback(WALL_SENSOR_PIN, GPIO_IRQ_EDGE_RISE, false, &check_if_wall); // enable rising edge interrupt
+            gpio_set_irq_enabled_with_callback(WALL_SENSOR_PIN, GPIO_IRQ_EDGE_RISE, false, &interrupt_callback); // enable rising edge interrupt
             barcodeFlags.isBarcode = true;
 
             printf("Barcode Detected please reverse robot\n");
@@ -193,7 +197,7 @@ void read_barcode()
     vTaskDelay(pdMS_TO_TICKS(1000));
     while (barcodeFlags.isBarcode)
     {
-        uint16_t reading = get_ir_reading();
+        uint16_t reading = adc_read();
         // printf("Reading: %d\n", reading);
 
         if (reading > BARCODE_THRESHOLD && !barcodeFlags.isPrevBlackBar)

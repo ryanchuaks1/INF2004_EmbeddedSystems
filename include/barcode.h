@@ -29,7 +29,7 @@
 void barcode_task(void* params);
 void barcode_init();
 int get_ir_reading();
-void check_if_wall();
+void check_if_wall(char isAlarm);
 void init_read_barcode();
 void read_barcode();
 void reset_barcode_params();
