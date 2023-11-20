@@ -21,6 +21,9 @@
 #include "task.h"
 #include "message_buffer.h"
 
+#include "lwip/apps/httpd.h"
+#include "pico/cyw43_arch.h"
+
 #define MAX_ROW 5
 #define MAX_COL 5
 #define WALL_MASK 0x0F

@@ -47,6 +47,9 @@ target_link_libraries(pico_car_project
     hardware_irq
     hardware_i2c
     
+    pico_cyw43_arch_lwip_threadsafe_background
+    pico_lwip_http
+
     FreeRTOS-Kernel-Heap4
 )
 
@@ -60,6 +63,12 @@ target_include_directories(pico_car_project PRIVATE
 target_compile_definitions(pico_car_project PRIVATE
     WIFI_SSID=\"${WIFI_SSID}\"
     WIFI_PASSWORD=\"${WIFI_PASSWORD}\"
+)
+
+# makefsdata python script
+execute_process(COMMAND
+    py makefsdata.py
+    WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}
 )
 
 # Enable USB serial output (optional)

@@ -19,6 +19,10 @@
 #include "pathfinding.h"
 #include "mapping.h"
 
+// Imports for wifi
+#include "lwipopts.h"
+#include "ssi.h"
+#include "cgi.h"
 
 // FreeRTOS only runs on 1 core
 #ifndef RUN_FREERTOS_ON_CORE
@@ -57,8 +61,5 @@ enum PID_STATE
     ADJUST, // Robot is adjusting its position
     SCANNING,   // Robot is scanning a barcode
 };
-
-
-
 
 #endif // MAIN_H
