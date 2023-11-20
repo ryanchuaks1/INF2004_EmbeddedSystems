@@ -131,7 +131,9 @@ void state_execute(struct Car* car){
             }
 
             else if(opcode == ULTRASONIC){
-                
+                printf("Activate Ultraconic State....");
+                change_state(car, OBSTACLE);
+
             }
 
             else if((float)(time_us_32() - start_time_us) / 1000 >= (float)duration_ms){
@@ -166,7 +168,43 @@ void state_execute(struct Car* car){
                 0
             );
             break;
+        case OBSTACLE:
+            printf("Inside Obstacle state\n");
+            set_stop();
+            set_speed(car->duty_cycle, car->wheels_ratio);
+            turn_with_interrupts(car, LEFT, U_TURN_INTERRUPT);
+            set_stop();
+            set_speed(car->duty_cycle, car->wheels_ratio);
+            set_direction(FORWARD);
+            vTaskDelay(2000);
+            //add_alarm_in_ms(2000, reverse_and_change, NULL, false);
+            set_stop();
+            change_state(global_car, IDLE);
+            break;
     }
+}
+
+int64_t reverse_and_change(alarm_id_t id, void *user_data) {
+    printf("End of Obstacle State...\n");
+    set_stop();
+    change_state(global_car, IDLE);
+    return 0;
+}
+
+void turn_with_interrupts(struct Car* car, enum DIRECTION direction, uint16_t no_of_interrupts)
+{
+    uint16_t starting_left_count = left_rising_edge_count;
+    uint16_t starting_right_count = right_rising_edge_count;
+
+    set_direction(direction);
+    set_speed(car->duty_cycle, car->wheels_ratio);
+
+    while(((left_rising_edge_count - starting_left_count) < no_of_interrupts) &&
+        ((right_rising_edge_count - starting_right_count) < no_of_interrupts)){
+        vTaskDelay(pdMS_TO_TICKS(10));
+    }
+
+    set_stop();
 }
 
 void state_exit(struct Car* car){
@@ -179,6 +217,9 @@ void state_exit(struct Car* car){
         case ADJUST:
             break;
         case SCANNING:
+            break;
+        case OBSTACLE:
+            set_stop();
             break;
     }
 }
@@ -302,7 +343,7 @@ void vLaunch(struct Car* car){
     xTaskCreate(motor_task, "motor_task", configMINIMAL_STACK_SIZE, (void *)car, MOTOR_TASK_PRIORITY, car->components[MOTOR]->task_handler);
     xTaskCreate(wheel_encoder_task, "wheel_encoder_task", configMINIMAL_STACK_SIZE, (void *)car, WHEEL_ENCODER_TASK_PRIORITY, car->components[WHEEL_ENCODER]->task_handler);    
     // xTaskCreate(barcode_task, "barcode_task", configMINIMAL_STACK_SIZE, car, BARCODE_TASK_PRIORITY, car->components[BARCODE]->task_handler);
-    // xTaskCreate(ultrasonic_task, "ultrasonic_task", configMINIMAL_STACK_SIZE, car, ULTRASONIC_TASK_PRIORITY, car->components[ULTRASONIC]->task_handler);
+    xTaskCreate(ultrasonic_task, "ultrasonic_task", configMINIMAL_STACK_SIZE, car, ULTRASONIC_TASK_PRIORITY, car->components[ULTRASONIC]->task_handler);
     // xTaskCreate(infrared_task, "infrared_task", configMINIMAL_STACK_SIZE, car, INFRARED_TASK_PRIORITY, car->components[INFRARED]->task_handler);
     // xTaskCreate(magnetometer_task, "magnetometer_task", configMINIMAL_STACK_SIZE, car, MAGNETOMETER_TASK_PRIORITY, car->components[MAGNETOMETER]->task_handler);
     vTaskStartScheduler();
