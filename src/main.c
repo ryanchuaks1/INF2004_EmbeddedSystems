@@ -5,8 +5,6 @@
 
 #include "../include/main.h"
 
-
-
 void state_enter(struct Car* car){
     switch(*(car->state)){
         case IDLE:
@@ -29,6 +27,8 @@ void state_execute(struct Car* car){
 
     uint16_t starting_left_count;
     uint16_t starting_right_count;
+    
+    //enum DIRECTION direction = FORWARD;
 
     switch(*(car->state)){
         case IDLE:
@@ -44,30 +44,45 @@ void state_execute(struct Car* car){
                     starting_left_count = left_rising_edge_count;
                     starting_right_count = right_rising_edge_count;
                     
-                    xBytesSent = xMessageBufferSend(
-                        *(car->components[MOTOR]->buffer),
-                        (void*)&duration_ms,
-                        sizeof(duration_ms),
-                        portMAX_DELAY
-                    );
+                    uint32_t start_time_us = time_us_32();
 
+                    set_forward();
+                    set_speed(car->duty_cycle, car->wheels_ratio);
                     vTaskDelay(pdMS_TO_TICKS(duration_ms));
+                    set_stop();
+                    // while(((time_us_32() - start_time_us) / 1000) < duration_ms){
+                    //     xMessageBufferReceive
+                    //     (
+                    //         *(car->main_buffer),
+                    //         (void*)&opcode,
+                    //         sizeof(opcode),
+                    //         duration_ms
+                    //     );
+                    // }
+                    // xBytesSent = xMessageBufferSend(
+                    //     *(car->components[MOTOR]->buffer),
+                    //     (void*)&duration_ms,
+                    //     sizeof(duration_ms),
+                    //     portMAX_DELAY
+                    // );
 
-                    xBytesReceived = xMessageBufferReceive(
-                        *(car->components[MOTOR]->buffer),
-                        (void*)&opcode,
-                        sizeof(opcode),
-                        portMAX_DELAY
-                    );
+                    // xBytesReceived = xMessageBufferReceive(
+                    //     *(car->main_buffer),
+                    //     (void*)&opcode,
+                    //     sizeof(opcode),
+                    //     portMAX_DELAY
+                    // );
 
-                    if(strcmp(opcode, "FIN") == 0){
-                        car->wheels_ratio = (float)(left_rising_edge_count - starting_left_count) / (float)(right_rising_edge_count - starting_right_count);
-                        printf("Left count: %d\n", (left_rising_edge_count - starting_left_count));
-                        printf("Right count: %d\n", (right_rising_edge_count - starting_right_count));
-                        printf("Calibration completed. Ratio is: %f\n", car->wheels_ratio);
-                    }
-
-                    // printf("Sending: %f, Size: %zu\n", duty_cycle, xBytesSent);
+                    // if(strcmp(opcode, "FIN") == 0){
+                    //     car->wheels_ratio = (float)(left_rising_edge_count - starting_left_count) / (float)(right_rising_edge_count - starting_right_count);
+                    //     printf("Left count: %d\n", (left_rising_edge_count - starting_left_count));
+                    //     printf("Right count: %d\n", (right_rising_edge_count - starting_right_count));
+                    //     printf("Calibration completed. Ratio is: %f\n", car->wheels_ratio);
+                    // }
+                    car->wheels_ratio = (float)(left_rising_edge_count - starting_left_count) / (float)(right_rising_edge_count - starting_right_count);
+                    printf("Left count: %d\n", (left_rising_edge_count - starting_left_count));
+                    printf("Right count: %d\n", (right_rising_edge_count - starting_right_count));
+                    printf("Calibration completed. Ratio is: %f\n", car->wheels_ratio);
                     break;
                 case '3':
                     printf("Enter 0 to 9, where 0 = 1s, 9 = 10s\n");
@@ -87,30 +102,28 @@ void state_execute(struct Car* car){
             starting_left_count = left_rising_edge_count;
             starting_right_count = right_rising_edge_count;
 
-            xBytesSent = xMessageBufferSend(
-                *(car->components[MOTOR]->buffer),
-                (void*)&duration_ms,
-                sizeof(duration_ms),
-                portMAX_DELAY
-            );
+            uint32_t start_time_us = time_us_32();
+            set_forward();
+            set_speed(car->duty_cycle, car->wheels_ratio);
 
-            vTaskDelay(pdMS_TO_TICKS(duration_ms));
-
-            xBytesReceived = xMessageBufferReceive(
-                *(car->components[MOTOR]->buffer),
+            xMessageBufferReceive
+            (
+                *(car->main_buffer),
                 (void*)&opcode,
                 sizeof(opcode),
-                portMAX_DELAY
+                pdMS_TO_TICKS(duration_ms)
             );
 
-            if(strcmp(opcode, "FIN") == 0){
-                printf("Destination reached\n");
-                printf("Left count: %d\n", (left_rising_edge_count - starting_left_count));
-                printf("Right count: %d\n", (right_rising_edge_count - starting_right_count));
-
+            if(strcmp(opcode, "IR_IRQ") == 0){
+                duration_ms -= (time_us_32() - start_time_us) / 1000;
+                change_state(car, SCANNING);
             }
 
-            change_state(car, IDLE);
+            else if((float)(time_us_32() - start_time_us) / 1000 >= (float)duration_ms){
+                printf("Finished...\n");
+                change_state(car, IDLE);
+            }
+
             break;
         case ADJUST:
             break;
@@ -125,6 +138,7 @@ void state_exit(struct Car* car){
         case IDLE:
             break;
         case TRANSIT:
+            set_stop();
             break;
         case ADJUST:
             break;
@@ -235,6 +249,7 @@ void vLaunch(struct Car* car){
     MessageBufferHandle_t motor_buffer = xMessageBufferCreate(mbaTASK_MESSAGE_BUFFER_SIZE);
     MessageBufferHandle_t ultrasonic_buffer = xMessageBufferCreate(mbaTASK_MESSAGE_BUFFER_SIZE);
     MessageBufferHandle_t wheel_encoder_buffer = xMessageBufferCreate(mbaTASK_MESSAGE_BUFFER_SIZE);
+    MessageBufferHandle_t main_buffer = xMessageBufferCreate(mbaTASK_MESSAGE_BUFFER_SIZE);
 
     car->components[BARCODE]->buffer = &barcode_buffer;
     car->components[INFRARED]->buffer = &infrared_buffer;
@@ -243,13 +258,14 @@ void vLaunch(struct Car* car){
     car->components[MOTOR]->buffer = &motor_buffer;
     car->components[ULTRASONIC]->buffer = &ultrasonic_buffer;
     car->components[WHEEL_ENCODER]->buffer = &wheel_encoder_buffer;
+    car->main_buffer = &main_buffer;
 
 
     xTaskCreate(main_task, "main_task", configMINIMAL_STACK_SIZE, (void *)car, MAIN_TASK_PRIORITY, NULL);
     // xTaskCreate(mapping_task, "mapping_task", configMINIMAL_STACK_SIZE, car, MAPPING_TASK_PRIORITY, car->components[MAPPING]->task_handler);
     xTaskCreate(motor_task, "motor_task", configMINIMAL_STACK_SIZE, (void *)car, MOTOR_TASK_PRIORITY, car->components[MOTOR]->task_handler);
     xTaskCreate(wheel_encoder_task, "wheel_encoder_task", configMINIMAL_STACK_SIZE, (void *)car, WHEEL_ENCODER_TASK_PRIORITY, car->components[WHEEL_ENCODER]->task_handler);    
-    // xTaskCreate(barcode_task, "barcode_task", configMINIMAL_STACK_SIZE, car, BARCODE_TASK_PRIORITY, car->components[BARCODE]->task_handler);
+    xTaskCreate(barcode_task, "barcode_task", configMINIMAL_STACK_SIZE, car, BARCODE_TASK_PRIORITY, car->components[BARCODE]->task_handler);
     // xTaskCreate(ultrasonic_task, "ultrasonic_task", configMINIMAL_STACK_SIZE, car, ULTRASONIC_TASK_PRIORITY, car->components[ULTRASONIC]->task_handler);
     // xTaskCreate(infrared_task, "infrared_task", configMINIMAL_STACK_SIZE, car, INFRARED_TASK_PRIORITY, car->components[INFRARED]->task_handler);
     // xTaskCreate(magnetometer_task, "magnetometer_task", configMINIMAL_STACK_SIZE, car, MAGNETOMETER_TASK_PRIORITY, car->components[MAGNETOMETER]->task_handler);

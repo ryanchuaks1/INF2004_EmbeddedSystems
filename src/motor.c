@@ -8,46 +8,64 @@
 void motor_task(void* params)
 {
     l298n_speed_pwm_setup(); // Initialise PWM for L298N
-    struct Car* car = (struct Car*)params;
-    uint16_t duration_ms = 0;
-    size_t xReceivedBytes;
-    MessageBufferHandle_t buffer = *(car->components[MOTOR]->buffer);
-
-    char* opcode = "FIN";
 
     while(true){
-        xReceivedBytes = xMessageBufferReceive
-        (
-            buffer,
-            (void*)&duration_ms,
-            sizeof(duration_ms),
-            portMAX_DELAY
-        );
-
-        if(xReceivedBytes > 0){
-            printf("Received: %d, Size: %zu\n", duration_ms, xReceivedBytes);
-            set_forward();
-            set_speed(car->duty_cycle, car->wheels_ratio);
-            add_alarm_in_ms(duration_ms, duration_callback, car, false);
-
-            vTaskDelay(pdMS_TO_TICKS(duration_ms));
-
-            while(!motor_finish){
-                tight_loop_contents();
-            }
-
-            xMessageBufferSend(
-                *(car->components[MOTOR]->buffer),
-                (void*)&opcode,
-                sizeof(opcode),
-                0
-            );
-
-            motor_finish = false;
-        }
-
         vTaskDelay(pdMS_TO_TICKS(1000));
     }
+    // struct Car* car = (struct Car*)params;
+    // size_t xReceivedBytes;
+    // MessageBufferHandle_t buffer = *(car->components[MOTOR]->buffer);
+
+    // char* opcode;
+
+    // while(true){
+    //     xReceivedBytes = xMessageBufferReceive
+    //     (
+    //         buffer,
+    //         (void*)&opcode,
+    //         sizeof(opcode),
+    //         portMAX_DELAY
+    //     );
+
+    //     if(xReceivedBytes > 0){
+    //         printf("Received: %s, Size: %zu\n", opcode, xReceivedBytes);
+    //         //uint32_t start_time_us = time_us_32();
+            
+    //         set_forward();
+    //         set_speed(car->duty_cycle, car->wheels_ratio);
+
+    //         while(((time_us_32() - start_time_us) / 1000) < duration_ms){
+    //             xReceivedBytes = xMessageBufferReceive
+    //             (
+    //                 buffer,
+    //                 (void*)&opcode,
+    //                 sizeof(opcode),
+    //                 duration_ms
+    //             );
+
+    //             if(strcmp(opcode, "STOP") == 0){
+    //                 set_stop();
+    //                 duration_ms -= (time_us_32() - start_time_us)/1000;
+    //             }
+                
+    //             else if (strcmp(opcode, "RESUME") == 0)
+    //             {
+    //                 set_forward();
+    //                 start_time_us = time_us_32();
+    //             }
+    //         }
+    //         opcode = "MOTOR_FIN";
+
+    //         xMessageBufferSend(
+    //             *(car->main_buffer),
+    //             (void*)&opcode,
+    //             sizeof(opcode),
+    //             0
+    //         );
+    //     }
+
+    //     vTaskDelay(pdMS_TO_TICKS(1000));
+    // }
 }
 
 int64_t duration_callback(alarm_id_t id, void *user_data){
@@ -114,7 +132,6 @@ int set_speed(float duty_cycle, float ratio)
         pwm_set_chan_level(SPEED_SLICE_NUM, PWM_CHAN_B, WRAP_VALUE * duty_cycle * ratio);
     }
     else{
-        printf("Calibrating\n");
         pwm_set_chan_level(SPEED_SLICE_NUM, PWM_CHAN_A, WRAP_VALUE * duty_cycle);
         pwm_set_chan_level(SPEED_SLICE_NUM, PWM_CHAN_B, WRAP_VALUE * duty_cycle);
     }

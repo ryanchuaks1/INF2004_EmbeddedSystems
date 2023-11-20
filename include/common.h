@@ -12,6 +12,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <math.h>
+#include <string.h>
 #include "pico/stdlib.h"
 #include "hardware/adc.h"
 #include "hardware/gpio.h"
@@ -61,6 +62,7 @@ struct Car{
     struct Component* components[COMPONENTS_COUNT];
     float wheels_ratio;
     float duty_cycle;
+    MessageBufferHandle_t* main_buffer;
 };
 
 #endif // COMMON_H

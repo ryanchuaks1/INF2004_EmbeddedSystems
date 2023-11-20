@@ -7,7 +7,6 @@
 #define MAIN_H
 
 //#include "common.h"
-#include <string.h>
 #include "barcode.h"
 #include "infrared.h"
 #include "magnetometer.h"
@@ -57,6 +56,8 @@ enum PID_STATE
     ADJUST, // Robot is adjusting its position
     SCANNING,   // Robot is scanning a barcode
 };
+
+
 
 
 #endif // MAIN_H

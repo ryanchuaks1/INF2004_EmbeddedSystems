@@ -7,6 +7,10 @@
 
 void barcode_task(void* params){
     barcode_init();   // Initialise barcode scanner,
+
+    while(true){
+        vTaskDelay(pdMS_TO_TICKS(1000));
+    }
 }
 
 void reset_barcode_params()
