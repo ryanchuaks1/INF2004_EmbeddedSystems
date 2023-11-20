@@ -75,16 +75,16 @@ void decode_barcode(int black_bar_times[], int white_bar_times[])
 {
     int dec_black_bar_times[] = {0, 0, 0, 0, 0}; // Array for black bar times
     int dec_white_bar_times[] = {0, 0, 0, 0, 0}; // Array for white bar times
-    dec_black_bar_times[0] = (white_bar_times[0] - black_bar_times[0]) / 10000;
-    dec_black_bar_times[1] = (white_bar_times[1] - black_bar_times[1]) / 10000;
-    dec_black_bar_times[2] = (white_bar_times[2] - black_bar_times[2]) / 10000;
-    dec_black_bar_times[3] = (white_bar_times[3] - black_bar_times[3]) / 10000;
-    dec_black_bar_times[4] = (white_bar_times[4] - black_bar_times[4]) / 10000;
+    dec_black_bar_times[0] = (white_bar_times[0] - black_bar_times[0]);
+    dec_black_bar_times[1] = (white_bar_times[1] - black_bar_times[1]);
+    dec_black_bar_times[2] = (white_bar_times[2] - black_bar_times[2]);
+    dec_black_bar_times[3] = (white_bar_times[3] - black_bar_times[3]);
+    dec_black_bar_times[4] = (white_bar_times[4] - black_bar_times[4]);
 
-    dec_white_bar_times[0] = (black_bar_times[1] - white_bar_times[0]) / 10000;
-    dec_white_bar_times[1] = (black_bar_times[2] - white_bar_times[1]) / 10000;
-    dec_white_bar_times[2] = (black_bar_times[3] - white_bar_times[2]) / 10000;
-    dec_white_bar_times[3] = (black_bar_times[4] - white_bar_times[3]) / 10000;
+    dec_white_bar_times[0] = (black_bar_times[1] - white_bar_times[0]);
+    dec_white_bar_times[1] = (black_bar_times[2] - white_bar_times[1]);
+    dec_white_bar_times[2] = (black_bar_times[3] - white_bar_times[2]);
+    dec_white_bar_times[3] = (black_bar_times[4] - white_bar_times[3]);
 
     // printf("Black bar times: %d %d %d %d %d\n", dec_black_bar_times[0], dec_black_bar_times[1], dec_black_bar_times[2], dec_black_bar_times[3], dec_black_bar_times[4]);
     // printf("White bar times: %d %d %d %d\n\n", dec_white_bar_times[0], dec_white_bar_times[1], dec_white_bar_times[2], dec_white_bar_times[3]);

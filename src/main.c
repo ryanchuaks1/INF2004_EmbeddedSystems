@@ -105,6 +105,20 @@ void state_execute(struct Car* car){
             uint32_t start_time_us = time_us_32();
             set_forward();
             set_speed(car->duty_cycle, car->wheels_ratio);
+            
+            xBytesSent = xMessageBufferSend(
+                *(car->components[INFRARED]->buffer),
+                (void*)&duration_ms,
+                sizeof(duration_ms),
+                portMAX_DELAY
+            );
+
+            xBytesSent = xMessageBufferSend(
+                *(car->components[MOTOR]->buffer),
+                (void*)&duration_ms,
+                sizeof(duration_ms),
+                portMAX_DELAY
+            );
 
             xMessageBufferReceive
             (
@@ -267,7 +281,7 @@ void vLaunch(struct Car* car){
     xTaskCreate(wheel_encoder_task, "wheel_encoder_task", configMINIMAL_STACK_SIZE, (void *)car, WHEEL_ENCODER_TASK_PRIORITY, car->components[WHEEL_ENCODER]->task_handler);    
     xTaskCreate(barcode_task, "barcode_task", configMINIMAL_STACK_SIZE, car, BARCODE_TASK_PRIORITY, car->components[BARCODE]->task_handler);
     // xTaskCreate(ultrasonic_task, "ultrasonic_task", configMINIMAL_STACK_SIZE, car, ULTRASONIC_TASK_PRIORITY, car->components[ULTRASONIC]->task_handler);
-    // xTaskCreate(infrared_task, "infrared_task", configMINIMAL_STACK_SIZE, car, INFRARED_TASK_PRIORITY, car->components[INFRARED]->task_handler);
+    xTaskCreate(infrared_task, "infrared_task", configMINIMAL_STACK_SIZE, car, INFRARED_TASK_PRIORITY, car->components[INFRARED]->task_handler);
     // xTaskCreate(magnetometer_task, "magnetometer_task", configMINIMAL_STACK_SIZE, car, MAGNETOMETER_TASK_PRIORITY, car->components[MAGNETOMETER]->task_handler);
     vTaskStartScheduler();
 }
