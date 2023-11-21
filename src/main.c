@@ -22,6 +22,12 @@ void state_enter(struct Car *car)
     }
 }
 
+void reset_msg_from_cgi()
+{
+    message_cgi = CGI_NULL_MESSAGE;
+    message_cgi_value = CGI_NULL_VALUE;
+}
+
 void state_execute(struct Car *car)
 {
     size_t xBytesSent;
@@ -41,15 +47,23 @@ void state_execute(struct Car *car)
     {
     case IDLE:
         printf("Main Menu. 1 = Change duty cycle, 2 = Calibrate wheels, 3 = Start car\n");
-        char input = getchar();
-        switch (input)
+        switch (message_cgi)
         {
-        case '1':
+        case CGI_MAIN_MENU:
+        {
             printf("Enter a number from 0 to 9, where 0 = 10%%, 9 = 100%%\n");
-            char duty_cycle_input = getchar();
-            car->duty_cycle = (float)atoi(&duty_cycle_input) / 10;
+            if (message_cgi_value < CGI_NULL_VALUE)
+            {
+                printf("Changing duty cycle to %d%%\n", message_cgi_value * 10);
+                car->duty_cycle = (float)(message_cgi_value) / 10; // Convert character to integer value and calculate duty cycle
+                reset_msg_from_cgi();
+                break;
+            }
             break;
-        case '2':
+        }
+        case CGI_CALIB_WHEELS:
+        {
+            printf("Calibrating wheels...\n");
             starting_left_count = left_rising_edge_count;
             starting_right_count = right_rising_edge_count;
 
@@ -60,64 +74,73 @@ void state_execute(struct Car *car)
             vTaskDelay(pdMS_TO_TICKS(duration_ms));
             set_stop();
 
-                    car->wheels_ratio = (float)(left_rising_edge_count - starting_left_count) / (float)(right_rising_edge_count - starting_right_count);
-                    printf("Left count: %d\n", (left_rising_edge_count - starting_left_count));
-                    printf("Right count: %d\n", (right_rising_edge_count - starting_right_count));
-                    printf("Calibration completed. Ratio is: %f\n", car->wheels_ratio);
-                    break;
-                case '3':
-                    printf("Enter direction: F = Forward, B = Backward, L = Left, R = Right\n");
-                    char direction_input = getchar();
-                    switch(direction_input){
-                        case 'F':
-                            printf("Enter 0 to 9, where 0 = 1s, 9 = 10s\n");
-                            char duration_input = getchar();
-                            duration_ms = ((uint16_t)atoi(&duration_input) + 1) * 1000;
-                            direction = FORWARD;
-                            change_state(car, TRANSIT);
-                            break;
-                        case 'B':
-                            direction = BACKWARD;
-                            change_state(car, ADJUST);
-                            break;
-                        case 'L':
-                            direction = LEFT;
-                            change_state(car, ADJUST);
-                            break;
-                        case 'R':
-                            direction = RIGHT;
-                            change_state(car, ADJUST);
-                            break;
-                    }
-                    break;
-                default:
-                    printf("Invalid input\n");
-                    break;
-            }
-
-            vTaskDelay(pdMS_TO_TICKS(1000));
+            car->wheels_ratio = (float)(left_rising_edge_count - starting_left_count) / (float)(right_rising_edge_count - starting_right_count);
+            printf("Left count: %d\n", (left_rising_edge_count - starting_left_count));
+            printf("Right count: %d\n", (right_rising_edge_count - starting_right_count));
+            printf("Calibration completed. Ratio is: %f\n", car->wheels_ratio);
+            reset_msg_from_cgi();
             break;
-        case TRANSIT:
-            starting_left_count = left_rising_edge_count;
-            starting_right_count = right_rising_edge_count;
+        }
+        case CGI_START_CAR:
+        {
+            printf("Enter direction: F = Forward, B = Backward, L = Left, R = Right\n");
+            if (message_cgi_direction == !CGI_NULL_VALUE)
+            {
+                switch (message_cgi_direction)
+                {
+                case CGI_FORWARD:
+                    printf("Enter 0 to 9, where 0 = 1s, 9 = 10s\n");
+                    char duration_input = 2;
+                    duration_ms = ((uint16_t)atoi(&duration_input) + 1) * 1000;
+                    direction = FORWARD;
+                    change_state(car, TRANSIT);
+                    reset_msg_from_cgi();
+                    break;
+                case CGI_BACKWARD:
+                    direction = BACKWARD;
+                    change_state(car, ADJUST);
+                    reset_msg_from_cgi();
+                    break;
+                case CGI_LEFT:
+                    direction = LEFT;
+                    change_state(car, ADJUST);
+                    reset_msg_from_cgi();
+                    break;
+                case CGI_RIGHT:
+                    direction = RIGHT;
+                    change_state(car, ADJUST);
+                    reset_msg_from_cgi();
+                    break;
+                }
+            }
+            break;
+        }
+        default:
+            printf("Current input is %d\n", message_cgi);
+            break;
+        }
 
-            xBytesSent = xMessageBufferSend(
-                *(car->components[INFRARED]->buffer),
-                (void*)&duration_ms,
-                sizeof(duration_ms),
-                0
-            );
+        vTaskDelay(pdMS_TO_TICKS(1500)); // Poll every 1.5 seconds
+        break;
+    case TRANSIT:
+        starting_left_count = left_rising_edge_count;
+        starting_right_count = right_rising_edge_count;
 
-            xBytesSent = xMessageBufferSend(
-                *(car->components[ULTRASONIC]->buffer),
-                (void*)&duration_ms,
-                sizeof(duration_ms),
-                0
-            );
+        xBytesSent = xMessageBufferSend(
+            *(car->components[INFRARED]->buffer),
+            (void *)&duration_ms,
+            sizeof(duration_ms),
+            0);
 
-            uint32_t start_time_us = time_us_32();
-            set_direction(direction);
-            set_speed(car->duty_cycle, car->wheels_ratio);
+        xBytesSent = xMessageBufferSend(
+            *(car->components[ULTRASONIC]->buffer),
+            (void *)&duration_ms,
+            sizeof(duration_ms),
+            0);
+
+        uint32_t start_time_us = time_us_32();
+        set_direction(direction);
+        set_speed(car->duty_cycle, car->wheels_ratio);
 
         xMessageBufferReceive(
             *(car->main_buffer),
@@ -125,17 +148,18 @@ void state_execute(struct Car *car)
             sizeof(opcode),
             pdMS_TO_TICKS(duration_ms));
 
-            printf("Received: %d\n", opcode);
+        printf("Received: %d\n", opcode);
 
-            if(opcode == BARCODE){
-                duration_ms -= (time_us_32() - start_time_us) / 1000;
-                direction = BACKWARD;
-                change_state(car, SCANNING);
-            }
+        if (opcode == BARCODE)
+        {
+            duration_ms -= (time_us_32() - start_time_us) / 1000;
+            direction = BACKWARD;
+            change_state(car, SCANNING);
+        }
 
-            else if(opcode == ULTRASONIC){
-                
-            }
+        else if (opcode == ULTRASONIC)
+        {
+        }
 
         else if ((float)(time_us_32() - start_time_us) / 1000 >= (float)duration_ms)
         {
@@ -143,33 +167,33 @@ void state_execute(struct Car *car)
             change_state(car, IDLE);
         }
 
-            // else{
-            //     printf("Error occured, received: %d\n", opcode);
-            // }
+        // else{
+        //     printf("Error occured, received: %d\n", opcode);
+        // }
 
-            break;
-        case ADJUST:
-            starting_left_count = left_rising_edge_count;
-            starting_right_count = right_rising_edge_count;
-            set_direction(direction);
-            set_speed(car->duty_cycle, car->wheels_ratio);
+        break;
+    case ADJUST:
+        starting_left_count = left_rising_edge_count;
+        starting_right_count = right_rising_edge_count;
+        set_direction(direction);
+        set_speed(car->duty_cycle, car->wheels_ratio);
 
-            while(((left_rising_edge_count - starting_left_count) < turn_interrupt_count) &&
-                ((right_rising_edge_count - starting_right_count) < turn_interrupt_count)){
-                vTaskDelay(pdMS_TO_TICKS(10));
-            }
+        while (((left_rising_edge_count - starting_left_count) < turn_interrupt_count) &&
+               ((right_rising_edge_count - starting_right_count) < turn_interrupt_count))
+        {
+            vTaskDelay(pdMS_TO_TICKS(10));
+        }
 
-            set_stop();
-            change_state(car, IDLE);
-            break;
-        case SCANNING:
-            xBytesSent = xMessageBufferSend(
-                *(car->components[BARCODE]->buffer),
-                (void*)&duration_ms,
-                sizeof(duration_ms),
-                0
-            );
-            break;
+        set_stop();
+        change_state(car, IDLE);
+        break;
+    case SCANNING:
+        xBytesSent = xMessageBufferSend(
+            *(car->components[BARCODE]->buffer),
+            (void *)&duration_ms,
+            sizeof(duration_ms),
+            0);
+        break;
     }
 }
 
@@ -356,7 +380,7 @@ int main()
 {
     stdio_init_all();
     init_wifi();
-    
+
     sleep_ms(5000);
 
     struct Car *car = (struct Car *)malloc(sizeof(struct Car));
