@@ -10,7 +10,7 @@ void barcode_task(void *params)
     struct Car* car = (struct Car*)params;
     barcode_init(); // Initialise barcode scanner,
 
-    char* opcode = "";
+    uint8_t opcode = 10;
 
     while (true)
     {
@@ -22,10 +22,16 @@ void barcode_task(void *params)
             portMAX_DELAY
         );
 
+        printf("the opcode is: %d", opcode);
+
+        // if(opcode == BARCODE){
+
+        // }
+
         while (barcodeFlags.isBarcode)
         {
             uint16_t reading = adc_read();
-            // printf("Reading: %d\n", reading);
+            printf("Reading: %d\n", reading);
 
             if (reading > BARCODE_THRESHOLD && !barcodeFlags.isPrevBlackBar)
             {
@@ -54,6 +60,15 @@ void barcode_task(void *params)
             }
             vTaskDelay(pdMS_TO_TICKS(10));
         }
+
+        xMessageBufferSend
+        (
+            *(car->main_buffer),
+            (void*)&opcode,
+            sizeof(opcode),
+            portMAX_DELAY
+        );
+        
         vTaskDelay(pdMS_TO_TICKS(1000));
     }
 }
@@ -89,6 +104,13 @@ void alarm_callback()
 {
     if (barcodeFlags.isBarcode == false)
     {
+        uint8_t message = INFRARED;
+        xMessageBufferSend(
+            *(global_car->main_buffer),
+            (void *)&message,
+            sizeof(message),
+            portMAX_DELAY
+        );
         printf("Wall detected please reverse robot\n");
     }
 }
@@ -100,21 +122,21 @@ void check_if_wall()
         barcodeFlags.count++;
         last_button_press_time = time_us_64(); // update last button press time
         last_wall_time = time_us_64();         // update last wall time
-        add_alarm_in_ms(1000, (alarm_callback_t)alarm_callback, NULL, false);
+        add_alarm_in_ms(500, (alarm_callback_t)alarm_callback, NULL, false);
 
         if (barcodeFlags.count > 1) // When wall is detected
         {
             // Disable interrupt and set flag
             gpio_set_irq_enabled_with_callback(WALL_SENSOR_PIN, GPIO_IRQ_EDGE_RISE, false, &interrupt_callback); // enable rising edge interrupt
-            barcodeFlags.isBarcode = true;
+            // barcodeFlags.isBarcode = true;
 
-            uint8_t message = BARCODE;
-            xMessageBufferSend(
-                *(global_car->main_buffer),
-                (void *)&message,
-                sizeof(message),
-                portMAX_DELAY
-            );
+            // uint8_t message = BARCODE;
+            // xMessageBufferSend(
+            //     *(global_car->main_buffer),
+            //     (void *)&message,
+            //     sizeof(message),
+            //     portMAX_DELAY
+            // );
 
             printf("Barcode Detected please reverse robot\n");
             // TODO: Tell main to stop motors and reverse

@@ -70,6 +70,9 @@ struct Car{
 
 void interrupt_callback(uint gpio, uint32_t events);
 extern struct Car* global_car;
+extern char start_delim;
+extern char letter;
+extern char end_delim;
 
 enum DIRECTION{
     FORWARD,
