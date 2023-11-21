@@ -57,9 +57,9 @@ const char *cgi_led_handler(int iIndex, int iNumParams, char *pcParam[], char *p
 }
 
 // CGI handler which is run when a request for /led.cgi is detected
-const char *cgi_movement_handler(int iIndex, int iNumParams, char *pcParam[], char *pcValue[])
+const char *cgi_action_handler(int iIndex, int iNumParams, char *pcParam[], char *pcValue[])
 {
-    if (strcmp(pcParam[0], "move") == 0)
+    if (strcmp(pcParam[0], "action") == 0)
     {
         if (strcmp(pcValue[0], "0") == 0)
             message_cgi = CGI_MAIN_MENU;
@@ -105,6 +105,24 @@ const char *cgi_number_handler(int iIndex, int iNumParams, char *pcParam[], char
     return "/index.shtml";
 }
 
+const char *cgi_direction_handler(int iIndex, int iNumParams, char *pcParam[], char *pcValue[])
+{
+    if (strcmp(pcParam[0], "direction") == 0)
+    {
+        if (strcmp(pcValue[0], "0") == 0)
+            message_cgi_direction = CGI_FORWARD;
+        else if (strcmp(pcValue[0], "1") == 0)
+            message_cgi_direction = CGI_BACKWARD;
+        else if (strcmp(pcValue[0], "2") == 0)
+            message_cgi_direction = CGI_LEFT;
+        else if (strcmp(pcValue[0], "3") == 0)
+            message_cgi_direction = CGI_RIGHT;
+    }
+
+    // Send the index page back to the user
+    return "/index.shtml";
+}
+
 // tCGI Struct
 // Fill this with all of the CGI requests and their respective handlers
 static const tCGI cgi_handlers[] = {
@@ -112,13 +130,16 @@ static const tCGI cgi_handlers[] = {
         "/led.cgi", cgi_led_handler // CGI request for "/led.cgi" with handler cgi_led_handler
     },
     {
-        "/move.cgi", cgi_movement_handler // CGI request for "/movement" with handler cgi_movement_handler
+        "/action.cgi", cgi_action_handler // CGI request for "/movement" with handler cgi_movement_handler
     },
     {
         "/num.cgi", cgi_number_handler // CGI request for "/number" with handler cgi_number_handler
+    },
+    {
+        "/direction.cgi", cgi_direction_handler // CGI request for "/direction" with handler cgi_direction_handler
     }};
 
 void cgi_init(void)
 {
-    http_set_cgi_handlers(cgi_handlers, 3);
+    http_set_cgi_handlers(cgi_handlers, 4);
 }

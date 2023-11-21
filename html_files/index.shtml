@@ -58,11 +58,11 @@
                 OFF</a>
         </div>
         <div class="mb-2 flex justify-around">
-            <a href="/move.cgi?move=0"
+            <a href="/action.cgi?action=0"
                 class="bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-2 px-4 rounded mr-2">Set Speed</a>
-            <a href="/move.cgi?move=1"
+            <a href="/action.cgi?action=1"
                 class="bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-2 px-4 rounded mr-2">Calibrate</a>
-            <a href="/move.cgi?move=2"
+            <a href="/action.cgi?action=2"
                 class="bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-2 px-4 rounded mr-2">Start Car</a>
         </div>
         <div class="speedSettings">
@@ -91,13 +91,25 @@
                     class="bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-2 px-4 rounded mr-2">9</a>
             </div>
         </div>
+        <div class="mt-6">
+            <div class="flex justify-center hidden" id="directionBtns">
+                <a href="/direction.cgi?direction=0"
+                    class="bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-2 px-4 rounded mr-2">Foward</a>
+                <a href="/direction.cgi?direction=1"
+                    class="bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-2 px-4 rounded mr-2">Backward</a>
+                <a href="/direction.cgi?direction=2"
+                    class="bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-2 px-4 rounded mr-2">Left</a>
+                <a href="/direction.cgi?direction=3"
+                    class="bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-2 px-4 rounded mr-2">Right</a>
+            </div>
+        </div>
     </div>
 
 </body>
 
 <script>
     // check if page url contains "/move.cgi?move=0"
-    if (window.location.href.indexOf("/move.cgi?move=0") > -1) {
+    if (window.location.href.indexOf("/action.cgi?action=0") > -1) {
         // if it does, then show the speed slider
         console.log("speed mode")
         document.getElementsByClassName("speedSettings")[0].classList.add("block");
@@ -109,17 +121,33 @@
         document.getElementsByClassName("speedSettings")[0].classList.remove("block")
     }
 
+    //check if page url contains "/move.cgi?move=1"
+    if (window.location.href.indexOf("/action.cgi?action=1") > -1) {
+        console.log("calibrate mode")
+        var carpic = document.getElementById("carpic");
+        carpic.classList.add("animate-pulse"); // Toggle the class on/off
+    } else {
+        console.log("not calibrate mode")
+    }
+
     //check if page url contains "/move.cgi?move=2"
-    if (window.location.href.indexOf("/move.cgi?move=2") > -1) {
+    if (window.location.href.indexOf("/action.cgi?action=2") > -1) {
         console.log("moving mode")
         function moveCar() {
             var carpic = document.getElementById("carpic");
             carpic.classList.toggle("-translate-y-10"); // Toggle the class on/off
         }
         setInterval(moveCar, 1000); // 1000 milliseconds = 1 second
+        document.getElementById("directionBtns").classList.remove("hidden")
     } else {
         console.log("not moving mode")
     } 
+
+    //check if page url contains "/direction.cgi?direction="
+    if (window.location.href.indexOf("/direction.cgi?direction=") > -1) {
+        console.log("direction mode finish")
+        document.getElementById("directionBtns").classList.add("hidden")
+    }
 </script>
 
 </html>
