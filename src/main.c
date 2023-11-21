@@ -32,7 +32,7 @@ void state_execute(struct Car* car){
     static uint16_t duration_ms = 10000;
     static enum DIRECTION direction = FORWARD;
 
-    uint8_t turn_interrupt_count = 9;
+    uint8_t turn_interrupt_count = 10;
 
     switch(*(car->state)){
         case IDLE:
@@ -131,8 +131,11 @@ void state_execute(struct Car* car){
                 set_stop();
                 set_speed(car->duty_cycle, car->wheels_ratio);
                 turn_with_interrupts(car, BACKWARD, turn_interrupt_count);
-                direction = RIGHT;
-                change_state(car, ADJUST);
+                turn_with_interrupts(car, RIGHT, turn_interrupt_count);
+                turn_with_interrupts(car, FORWARD, turn_interrupt_count);
+                change_state(car, IDLE);
+                //direction = RIGHT;
+                // change_state(car, ADJUST);
             }
 
             else if(opcode == ULTRASONIC){
@@ -369,7 +372,7 @@ void vLaunch(struct Car* car){
     xTaskCreate(motor_task, "motor_task", configMINIMAL_STACK_SIZE, (void *)car, MOTOR_TASK_PRIORITY, car->components[MOTOR]->task_handler);
     xTaskCreate(wheel_encoder_task, "wheel_encoder_task", configMINIMAL_STACK_SIZE, (void *)car, WHEEL_ENCODER_TASK_PRIORITY, car->components[WHEEL_ENCODER]->task_handler);    
     xTaskCreate(barcode_task, "barcode_task", configMINIMAL_STACK_SIZE, car, BARCODE_TASK_PRIORITY, car->components[BARCODE]->task_handler);
-    //xTaskCreate(ultrasonic_task, "ultrasonic_task", configMINIMAL_STACK_SIZE, car, ULTRASONIC_TASK_PRIORITY, car->components[ULTRASONIC]->task_handler);
+    xTaskCreate(ultrasonic_task, "ultrasonic_task", configMINIMAL_STACK_SIZE, car, ULTRASONIC_TASK_PRIORITY, car->components[ULTRASONIC]->task_handler);
     // xTaskCreate(infrared_task, "infrared_task", configMINIMAL_STACK_SIZE, car, INFRARED_TASK_PRIORITY, car->components[INFRARED]->task_handler);
     // xTaskCreate(magnetometer_task, "magnetometer_task", configMINIMAL_STACK_SIZE, car, MAGNETOMETER_TASK_PRIORITY, car->components[MAGNETOMETER]->task_handler);
     vTaskStartScheduler();

@@ -128,15 +128,15 @@ void check_if_wall()
         {
             // Disable interrupt and set flag
             gpio_set_irq_enabled_with_callback(WALL_SENSOR_PIN, GPIO_IRQ_EDGE_RISE, false, &interrupt_callback); // enable rising edge interrupt
-            barcodeFlags.isBarcode = true;
+            // barcodeFlags.isBarcode = true;
 
-            uint8_t message = BARCODE;
-            xMessageBufferSend(
-                *(global_car->main_buffer),
-                (void *)&message,
-                sizeof(message),
-                portMAX_DELAY
-            );
+            // uint8_t message = BARCODE;
+            // xMessageBufferSend(
+            //     *(global_car->main_buffer),
+            //     (void *)&message,
+            //     sizeof(message),
+            //     portMAX_DELAY
+            // );
 
             printf("Barcode Detected please reverse robot\n");
             // TODO: Tell main to stop motors and reverse
