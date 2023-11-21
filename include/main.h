@@ -29,6 +29,8 @@
 #define RUN_FREERTOS_ON_CORE 0
 #endif
 
+#define U_TURN_INTERRUPT 20 //Number of interrupts to U-turn
+
 // Priority value, all tasks are set to priority of 1, so round robin is used.
 #define MAIN_TASK_PRIORITY				        ( tskIDLE_PRIORITY + 2UL )
 #define BARCODE_TASK_PRIORITY				    ( tskIDLE_PRIORITY + 1UL )
@@ -53,6 +55,10 @@ void main_task(void* params);
 void car_init(struct Car* car);
 void set_direction(enum DIRECTION dir);
 
+int64_t reverse_and_change(alarm_id_t id, void *user_data);
+void turn_with_interrupts(struct Car* car, enum DIRECTION direction, uint16_t no_of_interrupts);
+
+
 
 enum PID_STATE
 {
@@ -60,6 +66,7 @@ enum PID_STATE
     TRANSIT,    // Robot is moving
     ADJUST, // Robot is adjusting its position
     SCANNING,   // Robot is scanning a barcode
+    OBSTACLE, // Switch to this state when there is an obstacle detected by the ultrasonic
 };
 
 #endif // MAIN_H
