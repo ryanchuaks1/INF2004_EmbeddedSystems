@@ -42,7 +42,7 @@ void state_execute(struct Car *car)
     static uint16_t duration_ms = 10000;
     static enum DIRECTION direction = FORWARD;
 
-    uint8_t turn_interrupt_count = 8;
+    uint8_t turn_interrupt_count = 10;
 
     switch (*(car->state))
     {
@@ -128,48 +128,48 @@ void state_execute(struct Car *car)
         vTaskDelay(pdMS_TO_TICKS(1500)); // Poll every 1.5 seconds
         break;
     case TRANSIT:
-        // starting_left_count = left_rising_edge_count;
-        // starting_right_count = right_rising_edge_count;
-
-        // printf("From Transit Stage, move %d ms\n", duration_ms);
-
         xBytesSent = xMessageBufferSend(
             *(car->components[INFRARED]->buffer),
             (void *)&duration_ms,
             sizeof(duration_ms),
             0);
-
         xBytesSent = xMessageBufferSend(
             *(car->components[ULTRASONIC]->buffer),
             (void *)&duration_ms,
             sizeof(duration_ms),
             0);
-
         uint32_t start_time_us = time_us_32();
         set_direction(direction);
         set_speed(car->duty_cycle, car->wheels_ratio);
-
         xMessageBufferReceive(
             *(car->main_buffer),
             (void *)&opcode,
             sizeof(opcode),
             pdMS_TO_TICKS(duration_ms));
-
         printf("Received: %f\n", (float)(time_us_32() - start_time_us) / 1000);
-
         if (opcode == BARCODE)
         {
             duration_ms -= (time_us_32() - start_time_us) / 1000;
             direction = BACKWARD;
             change_state(car, SCANNING);
         }
-
+        else if (opcode == INFRARED)
+        {
+            set_stop();
+            set_speed(car->duty_cycle, car->wheels_ratio);
+            turn_with_interrupts(car, BACKWARD, turn_interrupt_count);
+            turn_with_interrupts(car, RIGHT, turn_interrupt_count);
+            turn_with_interrupts(car, FORWARD, turn_interrupt_count);
+            change_state(car, IDLE);
+            // direction = RIGHT;
+            //  change_state(car, ADJUST);
+        }
         else if (opcode == ULTRASONIC)
         {
+            // duration_ms -= (time_us_32() - start_time_us) / 1000;
             printf("Activate Ultraconic State....");
             change_state(car, OBSTACLE);
         }
-
         else if ((float)(time_us_32() - start_time_us) / 1000 >= (float)duration_ms)
         {
             printf("Finished...\n");
@@ -197,24 +197,44 @@ void state_execute(struct Car *car)
         change_state(car, IDLE);
         break;
     case SCANNING:
+        set_direction(BACKWARD);
+        set_speed(car->duty_cycle, car->wheels_ratio);
+        vTaskDelay(pdMS_TO_TICKS(100));
+        set_stop();
+        opcode = BARCODE;
         xBytesSent = xMessageBufferSend(
             *(car->components[BARCODE]->buffer),
-            (void *)&duration_ms,
-            sizeof(duration_ms),
-            0);
+            (void *)&opcode,
+            sizeof(opcode),
+            portMAX_DELAY);
+
+        set_speed(car->duty_cycle, car->wheels_ratio);
+        set_direction(FORWARD);
+
+        xMessageBufferReceive(
+            *(car->main_buffer),
+            (void *)&opcode,
+            sizeof(opcode),
+            portMAX_DELAY);
+
+        if (opcode == BARCODE)
+        {
+            set_stop();
+            change_state(car, IDLE);
+        }
         break;
     case OBSTACLE:
         printf("Inside Obstacle state\n");
-        set_stop();
+        // set_stop();
+        // set_speed(car->duty_cycle, car->wheels_ratio);
+        // turn_with_interrupts(car, LEFT, U_TURN_INTERRUPT);
+        // set_stop();
         set_speed(car->duty_cycle, car->wheels_ratio);
-        turn_with_interrupts(car, LEFT, U_TURN_INTERRUPT);
-        set_stop();
-        set_speed(car->duty_cycle, car->wheels_ratio);
-        set_direction(FORWARD);
-        vTaskDelay(2000);
+        set_direction(BACKWARD);
+        vTaskDelay(pdMS_TO_TICKS(2000));
         // add_alarm_in_ms(2000, reverse_and_change, NULL, false);
         set_stop();
-        change_state(global_car, IDLE);
+        change_state(car, IDLE);
         break;
     }
 }
