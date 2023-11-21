@@ -41,7 +41,8 @@ void test_rtos()
 int main()
 {
     stdio_init_all();
-    xTaskCreate(test_rtos, "test_rtos", 1024, NULL, 1, NULL);
+    barcode_init();
+    //xTaskCreate(test_rtos, "test_rtos", 1024, NULL, 1, NULL);
     vTaskStartScheduler();
 
     while(1){};
