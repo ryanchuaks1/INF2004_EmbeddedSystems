@@ -126,6 +126,9 @@
         console.log("calibrate mode")
         var carpic = document.getElementById("carpic");
         carpic.classList.add("animate-pulse"); // Toggle the class on/off
+        setTimeout(function () {
+            carpic.classList.remove("animate-pulse");
+        }, 10000);
     } else {
         console.log("not calibrate mode")
     }

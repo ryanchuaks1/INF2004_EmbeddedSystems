@@ -128,10 +128,10 @@ void state_execute(struct Car *car)
         vTaskDelay(pdMS_TO_TICKS(1500)); // Poll every 1.5 seconds
         break;
     case TRANSIT:
-        starting_left_count = left_rising_edge_count;
-        starting_right_count = right_rising_edge_count;
+        // starting_left_count = left_rising_edge_count;
+        // starting_right_count = right_rising_edge_count;
 
-        printf("From Transit Stage, move %d ms\n", duration_ms);
+        // printf("From Transit Stage, move %d ms\n", duration_ms);
 
         xBytesSent = xMessageBufferSend(
             *(car->components[INFRARED]->buffer),
@@ -155,7 +155,7 @@ void state_execute(struct Car *car)
             sizeof(opcode),
             pdMS_TO_TICKS(duration_ms));
 
-        printf("Received: %d\n", opcode);
+        printf("Received: %f\n", (float)(time_us_32() - start_time_us) / 1000);
 
         if (opcode == BARCODE)
         {
