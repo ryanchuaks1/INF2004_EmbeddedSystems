@@ -133,11 +133,6 @@
     //check if page url contains "/move.cgi?move=2"
     if (window.location.href.indexOf("/action.cgi?action=2") > -1) {
         console.log("moving mode")
-        function moveCar() {
-            var carpic = document.getElementById("carpic");
-            carpic.classList.toggle("-translate-y-10"); // Toggle the class on/off
-        }
-        setInterval(moveCar, 1000); // 1000 milliseconds = 1 second
         document.getElementById("directionBtns").classList.remove("hidden")
     } else {
         console.log("not moving mode")
@@ -146,7 +141,14 @@
     //check if page url contains "/direction.cgi?direction="
     if (window.location.href.indexOf("/direction.cgi?direction=") > -1) {
         console.log("direction mode finish")
+        function moveCar() {
+            var carpic = document.getElementById("carpic");
+            carpic.classList.toggle("-translate-y-10"); // Toggle the class on/off
+        }
+        setInterval(moveCar, 1000); // 1000 milliseconds = 1 second
         document.getElementById("directionBtns").classList.add("hidden")
+        document.getElementsByClassName("speedSettings")[0].classList.add("block");
+        document.getElementsByClassName("speedSettings")[0].classList.remove("hidden")
     }
 </script>
 

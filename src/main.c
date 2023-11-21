@@ -93,11 +93,13 @@ void state_execute(struct Car *car)
                 {
                 case CGI_FORWARD:
                     printf("Enter 0 to 9, where 0 = 1s, 9 = 10s\n");
-                    char duration_input = 2;
-                    duration_ms = ((uint16_t)atoi(&duration_input) + 1) * 1000;
-                    direction = FORWARD;
-                    change_state(car, TRANSIT);
-                    reset_msg_from_cgi();
+                    if (message_cgi_value < CGI_NULL_VALUE)
+                    {
+                        duration_ms = (uint16_t)(message_cgi_value) * 1000;
+                        direction = FORWARD;
+                        change_state(car, TRANSIT);
+                        reset_msg_from_cgi();
+                    }
                     break;
                 case CGI_BACKWARD:
                     direction = BACKWARD;
@@ -128,6 +130,8 @@ void state_execute(struct Car *car)
     case TRANSIT:
         starting_left_count = left_rising_edge_count;
         starting_right_count = right_rising_edge_count;
+
+        printf("From Transit Stage, move %d ms\n", duration_ms);
 
         xBytesSent = xMessageBufferSend(
             *(car->components[INFRARED]->buffer),
