@@ -24,12 +24,12 @@ struct Wheel_Encoder_Flags{
 
 volatile static uint8_t encoder_interrupt_count = 0;
 
-extern uint16_t left_rising_edge_count;
-extern uint16_t right_rising_edge_count;
+extern int left_rising_edge_count;
+extern int right_rising_edge_count;
 
-void wheel_encoder_task(void* params);
-void measure_edges(uint gpio, uint32_t events);
+// void wheel_encoder_task(void* params);
+// void measure_edges(uint gpio, uint32_t events);
 void wheel_encoder_init();
-float read_speed(float start_time, float end_time, float* total_distance);
+float read_speed(float start_time, float end_time);
 
 #endif

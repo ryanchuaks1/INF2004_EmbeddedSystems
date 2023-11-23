@@ -104,13 +104,6 @@ void alarm_callback()
 {
     if (barcodeFlags.isBarcode == false)
     {
-        uint8_t message = INFRARED;
-        xMessageBufferSend(
-            *(global_car->main_buffer),
-            (void *)&message,
-            sizeof(message),
-            portMAX_DELAY
-        );
         printf("Wall detected please reverse robot\n");
     }
 }

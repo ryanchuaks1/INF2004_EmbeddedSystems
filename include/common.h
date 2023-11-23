@@ -81,4 +81,11 @@ enum DIRECTION{
     RIGHT
 };
 
+enum SENSOR_DIRECTION {
+    LEFT_SENSOR,
+    FRONT_SENSOR
+};
+
+
+
 #endif // COMMON_H

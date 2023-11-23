@@ -34,6 +34,7 @@ void decode_barcode(int black_bar_times[], int white_bar_times[]);
 //void read_barcode();
 void reset_barcode_params();
 void barcode_to_char();
+void alarm_callback();
 
 enum BarType
 {

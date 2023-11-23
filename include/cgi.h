@@ -35,9 +35,9 @@ enum cgiMessageDirection
     CGI_NULL_DIRECTION
 };
 
-extern enum cgiMessage message_cgi = CGI_NULL_MESSAGE;
-extern enum cgiMessageValue message_cgi_value = CGI_NULL_VALUE;
-extern enum cgiMessageDirection message_cgi_direction = CGI_NULL_DIRECTION;
+extern enum cgiMessage message_cgi;
+extern enum cgiMessageValue message_cgi_value;
+extern enum cgiMessageDirection message_cgi_direction;
 
 // CGI handler which is run when a request for /led.cgi is detected
 const char *cgi_led_handler(int iIndex, int iNumParams, char *pcParam[], char *pcValue[])
@@ -142,4 +142,7 @@ static const tCGI cgi_handlers[] = {
 void cgi_init(void)
 {
     http_set_cgi_handlers(cgi_handlers, 4);
+    message_cgi = CGI_NULL_MESSAGE;
+    message_cgi_value = CGI_NULL_VALUE;
+    message_cgi_direction = CGI_NULL_DIRECTION;
 }
