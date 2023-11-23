@@ -48,13 +48,6 @@ void main_task(void *params)
         {
         case MOVING:
             printf("Moving...\n");
-            if (left_rising_edge_count - last_left_wall_time > 10)
-            {
-                set_right();
-                vTaskDelay(pdMS_TO_TICKS(50));
-                set_forward();
-                break;
-            }
             set_forward();
             break;
 
@@ -71,7 +64,7 @@ void main_task(void *params)
             printf("Turning...\n");
             decide_direction();
             car_state = DEBUG;
-            uint8_t turn_amount = direction == LEFT ? 4 : 8;
+            uint8_t turn_amount = direction == LEFT ? 4 : 6;
             current_count = left_rising_edge_count + turn_amount;
             while (left_rising_edge_count < current_count)
             {
@@ -96,7 +89,7 @@ void init_all_componenets()
     l298n_speed_pwm_setup();
     wheel_encoder_init();
     ir_sensor_init();
-    set_speed(0.6, 1);
+    set_speed(0.7, 1);
 }
 
 void init_all_params()
