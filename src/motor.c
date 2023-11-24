@@ -5,73 +5,23 @@
 
 #include "../include/motor.h"
 
+/**
+ * motor_task()
+ * --------
+ * Purpose: VTask to be ran by freeRtos.
+ *          Initialises the l298n
+ *          Runs anything in the while loop
+ * Arguments: params from vTask
+ * Return: 1 as completed
+ */
 void motor_task(void* params)
 {
     l298n_speed_pwm_setup(); // Initialise PWM for L298N
 
     while(true){
+        //Nothing in the while loop, meant for future implementations
         vTaskDelay(pdMS_TO_TICKS(1000));
     }
-    // struct Car* car = (struct Car*)params;
-    // size_t xReceivedBytes;
-    // MessageBufferHandle_t buffer = *(car->components[MOTOR]->buffer);
-
-    // char* opcode;
-
-    // while(true){
-    //     xReceivedBytes = xMessageBufferReceive
-    //     (
-    //         buffer,
-    //         (void*)&opcode,
-    //         sizeof(opcode),
-    //         portMAX_DELAY
-    //     );
-
-    //     if(xReceivedBytes > 0){
-    //         printf("Received: %s, Size: %zu\n", opcode, xReceivedBytes);
-    //         //uint32_t start_time_us = time_us_32();
-            
-    //         set_forward();
-    //         set_speed(car->duty_cycle, car->wheels_ratio);
-
-    //         while(((time_us_32() - start_time_us) / 1000) < duration_ms){
-    //             xReceivedBytes = xMessageBufferReceive
-    //             (
-    //                 buffer,
-    //                 (void*)&opcode,
-    //                 sizeof(opcode),
-    //                 duration_ms
-    //             );
-
-    //             if(strcmp(opcode, "STOP") == 0){
-    //                 set_stop();
-    //                 duration_ms -= (time_us_32() - start_time_us)/1000;
-    //             }
-                
-    //             else if (strcmp(opcode, "RESUME") == 0)
-    //             {
-    //                 set_forward();
-    //                 start_time_us = time_us_32();
-    //             }
-    //         }
-    //         opcode = "MOTOR_FIN";
-
-    //         xMessageBufferSend(
-    //             *(car->main_buffer),
-    //             (void*)&opcode,
-    //             sizeof(opcode),
-    //             0
-    //         );
-    //     }
-
-    //     vTaskDelay(pdMS_TO_TICKS(1000));
-    // }
-}
-
-int64_t duration_callback(alarm_id_t id, void *user_data){
-    set_stop();
-    motor_finish = true;
-    return 0;
 }
 
 /**
@@ -107,31 +57,34 @@ int l298n_speed_pwm_setup()
  * --------
  * Purpose: Set the speed using the PWM for the car to move. 
  *          This function makes the car start
- * Arguments: duty_cycle of the PWM. Range from 0 to 1, 1 being 100%
+ * Arguments: duty_cycle of the PWM. Ratio = How much is one wheel faster than the other
  * Return: 1 as completed
  */
 int set_speed(float duty_cycle, float ratio)
 {
-    // // Divide the clock by 125Mhz / 200 = 625 000
+    // Divide the clock by 125Mhz / 200 = 625 000
     pwm_set_clkdiv(SPEED_SLICE_NUM, CLOCK_DIVIDER); 
 
-    // // Divide the Clock into 12500 Virtual Clock cycles
-    // // Frequency = 625 000 / 31250 = 20 Hz as stated in the specifications
+    // Divide the Clock into 12500 Virtual Clock cycles
+    // Frequency = 625 000 / 31250 = 20 Hz 
     pwm_set_wrap(SPEED_SLICE_NUM, WRAP_VALUE);
 
-    // // Set the Duty cycle of the PWN signal to be 50% by dividing by 2 on channel A (PWM GPIO 2 is on Channel A)
-
+    // Set the Duty cycle of the PWN signal base on the ratio from Calibrations
+    //left wheel = Channel A (ENA)
+    //right wheel = Channel B (ENB)
     if(ratio > 1){
-        //left wheel = Channel A (ENA)
-        //right wheel = Channel B (ENB)
+
+        //Increase the speed of the left wheel for straight line
         pwm_set_chan_level(SPEED_SLICE_NUM, PWM_CHAN_A, WRAP_VALUE * duty_cycle * (1 / ratio));
         pwm_set_chan_level(SPEED_SLICE_NUM, PWM_CHAN_B, WRAP_VALUE * duty_cycle);
     }
     else if (ratio < 1){
+        //Lower the speed of the right wheel for straight line
         pwm_set_chan_level(SPEED_SLICE_NUM, PWM_CHAN_A, WRAP_VALUE * duty_cycle);
         pwm_set_chan_level(SPEED_SLICE_NUM, PWM_CHAN_B, WRAP_VALUE * duty_cycle * ratio);
     }
     else{
+        //If Both the same, set to the same duty cycle each
         pwm_set_chan_level(SPEED_SLICE_NUM, PWM_CHAN_A, WRAP_VALUE * duty_cycle);
         pwm_set_chan_level(SPEED_SLICE_NUM, PWM_CHAN_B, WRAP_VALUE * duty_cycle);
     }
@@ -141,40 +94,43 @@ int set_speed(float duty_cycle, float ratio)
     return 1;
 }
 
+/**
+ * set_direction()
+ * --------
+ * Purpose: Set the Direction of the car base on the DORECTION Enum. Useful for functions using the enum.
+ *          Uses a Swtch case statement
+ * Arguments: enum DIRECTION dir
+ * Return: NULL
+ */
 void set_direction(enum DIRECTION dir){
     switch(dir){
         case FORWARD:
             printf("Forward...\n");
-            gpio_put(L298N_INPUT_1, 1);
-            gpio_put(L298N_INPUT_2, 0);
-            gpio_put(L298N_INPUT_3, 1);
-            gpio_put(L298N_INPUT_4, 0);
+            set_forward();
             break;
         case BACKWARD:
             printf("Backward...\n");
-            gpio_put(L298N_INPUT_1, 0);
-            gpio_put(L298N_INPUT_2, 1);
-            gpio_put(L298N_INPUT_3, 0);
+            set_backward();
             gpio_put(L298N_INPUT_4, 1);
             break;
         case LEFT:
             printf("Left...\n");
-            gpio_put(L298N_INPUT_1, 0);
-            gpio_put(L298N_INPUT_2, 1);
-            gpio_put(L298N_INPUT_3, 1);
-            gpio_put(L298N_INPUT_4, 0);
+            set_left();
             break;
         case RIGHT:
             printf("Right...\n");
-            gpio_put(L298N_INPUT_1, 1);
-            gpio_put(L298N_INPUT_2, 0);
-            gpio_put(L298N_INPUT_3, 0);
-            gpio_put(L298N_INPUT_4, 1);
+            set_right();
             break;
     }
 }
 
-// Set the car to run forward
+/**
+ * set_forward()
+ * --------
+ * Purpose: Set the car to run forward by setting the GPIO pins on the controller
+ * Arguments: NULL
+ * Return: NULL
+ */
 void set_forward()
 {
     gpio_put(L298N_INPUT_1, 1);
@@ -183,7 +139,13 @@ void set_forward()
     gpio_put(L298N_INPUT_4, 0);
 }
 
-// Set the car to run backward
+/**
+ * set_backward()
+ * --------
+ * Purpose: Set the car to run backward by setting the GPIO pins on the controller
+ * Arguments: NULL
+ * Return: NULL
+ */
 void set_backward()
 {
     gpio_put(L298N_INPUT_1, 0);
@@ -192,7 +154,13 @@ void set_backward()
     gpio_put(L298N_INPUT_4, 1);
 }
 
-// Set the car to turn left
+/**
+ * set_left()
+ * --------
+ * Purpose: Set the car to turn left by setting the GPIO pins on the controller
+ * Arguments: NULL
+ * Return: NULL
+ */
 void set_left()
 {
     gpio_put(L298N_INPUT_1, 0);
@@ -201,7 +169,13 @@ void set_left()
     gpio_put(L298N_INPUT_4, 0);
 }
 
-// Set the car to turn right
+/**
+ * set_right()
+ * --------
+ * Purpose: Set the car to turn right by setting the GPIO pins on the controller
+ * Arguments: NULL
+ * Return: NULL
+ */
 void set_right()
 {
     gpio_put(L298N_INPUT_1, 1);
@@ -210,7 +184,14 @@ void set_right()
     gpio_put(L298N_INPUT_4, 1);
 }
 
-// Stops the car
+
+/**
+ * set_stop()
+ * --------
+ * Purpose: Stops the car by setting the GPIO pins on the controller.
+ * Arguments: NULL
+ * Return: NULL
+ */
 void set_stop()
 {
     gpio_put(L298N_INPUT_1, 0);
@@ -218,33 +199,3 @@ void set_stop()
     gpio_put(L298N_INPUT_3, 0);
     gpio_put(L298N_INPUT_4, 0);
 }
-
-// Sameple Main to run the function (To be Deleted After Submission)
-// int main() {
-//     stdio_init_all();
-    
-//     l298n_speed_pwm_setup();
-
-//     set_speed(0.5);
-
-//     while (1)
-//     {
-//         printf("Looping...");
-//         set_forward();
-
-//         if(gpio_get(L298N_INPUT_1))
-//         {
-//             printf("Forward");
-//         }
-//         sleep_ms(1000);
-//         set_backward();
-//         if(gpio_get(L298N_INPUT_2))
-//         {
-//             printf("backward");
-//         }
-//         sleep_ms(1000);
-        
-//     }
-// }
-
-
