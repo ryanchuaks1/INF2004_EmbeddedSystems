@@ -25,12 +25,6 @@ struct LinkedList{
     struct Node *tail;
 };
 
-// struct Node{
-//     struct Node *prev;
-//     struct Node *next;
-//     struct Node* value;
-// };
-
 void ll_init(struct LinkedList* ll);
 void insertAtHead(struct LinkedList* ll, struct Node* newNode);
 void insertAtTail(struct LinkedList* ll, struct Node* newNode);
