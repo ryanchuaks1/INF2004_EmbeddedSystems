@@ -1,6 +1,6 @@
 /*
  * Author: Leung Wei Jun
- * Description: TODO: Add description
+ * Description: Node struct and its related function prototypes
  */
 
 #ifndef NODE_H
