@@ -5,71 +5,6 @@
 
 #include "../include/motor.h"
 
-// void motor_task(void *params)
-// {
-//     l298n_speed_pwm_setup(); // Initialise PWM for L298N
-
-//     while (true)
-//     {
-//         vTaskDelay(pdMS_TO_TICKS(1000));
-//     }
-//     // struct Car* car = (struct Car*)params;
-    // size_t xReceivedBytes;
-    // MessageBufferHandle_t buffer = *(car->components[MOTOR]->buffer);
-
-    // char* opcode;
-
-    // while(true){
-    //     xReceivedBytes = xMessageBufferReceive
-    //     (
-    //         buffer,
-    //         (void*)&opcode,
-    //         sizeof(opcode),
-    //         portMAX_DELAY
-    //     );
-
-    //     if(xReceivedBytes > 0){
-    //         printf("Received: %s, Size: %zu\n", opcode, xReceivedBytes);
-    //         //uint32_t start_time_us = time_us_32();
-
-    //         set_forward();
-    //         set_speed(car->duty_cycle, car->wheels_ratio);
-
-    //         while(((time_us_32() - start_time_us) / 1000) < duration_ms){
-    //             xReceivedBytes = xMessageBufferReceive
-    //             (
-    //                 buffer,
-    //                 (void*)&opcode,
-    //                 sizeof(opcode),
-    //                 duration_ms
-    //             );
-
-    //             if(strcmp(opcode, "STOP") == 0){
-    //                 set_stop();
-    //                 duration_ms -= (time_us_32() - start_time_us)/1000;
-    //             }
-
-    //             else if (strcmp(opcode, "RESUME") == 0)
-    //             {
-    //                 set_forward();
-    //                 start_time_us = time_us_32();
-    //             }
-    //         }
-    //         opcode = "MOTOR_FIN";
-
-    //         xMessageBufferSend(
-    //             *(car->main_buffer),
-    //             (void*)&opcode,
-    //             sizeof(opcode),
-    //             0
-    //         );
-    //     }
-
-    //     vTaskDelay(pdMS_TO_TICKS(1000));
-    // }
-// }
-
-
 
 /**
  * l298n_speed_pwm_setup()
@@ -99,12 +34,6 @@ int l298n_speed_pwm_setup()
     return 1;
 }
 
-
-int64_t duration_callback(alarm_id_t id, void *user_data)
-{
-    set_stop();
-    return 0;
-}
 
 /**
  * set_speed()
@@ -137,41 +66,6 @@ void set_speed(float left_wheel_duty_cycle, float right_wheel_duty_cycle)
     // pwm_set_enabled(0, true);
 }
 
-void set_direction(enum DIRECTION dir)
-{
-    switch (dir)
-    {
-    case FORWARD:
-        printf("Forward...\n");
-        gpio_put(L298N_INPUT_1, 1);
-        gpio_put(L298N_INPUT_2, 0);
-        gpio_put(L298N_INPUT_3, 1);
-        gpio_put(L298N_INPUT_4, 0);
-        break;
-    case BACKWARD:
-        printf("Backward...\n");
-        gpio_put(L298N_INPUT_1, 0);
-        gpio_put(L298N_INPUT_2, 1);
-        gpio_put(L298N_INPUT_3, 0);
-        gpio_put(L298N_INPUT_4, 1);
-        break;
-    case LEFT:
-        printf("Left...\n");
-        gpio_put(L298N_INPUT_1, 0);
-        gpio_put(L298N_INPUT_2, 1);
-        gpio_put(L298N_INPUT_3, 1);
-        gpio_put(L298N_INPUT_4, 0);
-        break;
-    case RIGHT:
-        printf("Right...\n");
-        gpio_put(L298N_INPUT_1, 1);
-        gpio_put(L298N_INPUT_2, 0);
-        gpio_put(L298N_INPUT_3, 0);
-        gpio_put(L298N_INPUT_4, 1);
-        break;
-    }
-}
-
 // Set the car to run forward
 void set_forward()
 {
@@ -194,8 +88,22 @@ void set_backward()
 void set_left()
 {
     gpio_put(L298N_INPUT_1, 0);
-    gpio_put(L298N_INPUT_2, 1);
-    gpio_put(L298N_INPUT_3, 1);
+    gpio_put(L298N_INPUT_2, 1); // Right back
+    gpio_put(L298N_INPUT_3, 1); // Left forward
+    gpio_put(L298N_INPUT_4, 0);
+}
+
+void set_left_back() {
+    gpio_put(L298N_INPUT_1, 0); // Right forward
+    gpio_put(L298N_INPUT_2, 0); // Right back
+    gpio_put(L298N_INPUT_3, 0); // Left forward
+    gpio_put(L298N_INPUT_4, 1); // Left back
+}
+
+void set_left_forward() {
+    gpio_put(L298N_INPUT_1, 0);
+    gpio_put(L298N_INPUT_2, 0); // Right back
+    gpio_put(L298N_INPUT_3, 1); // Left forward
     gpio_put(L298N_INPUT_4, 0);
 }
 
@@ -208,6 +116,20 @@ void set_right()
     gpio_put(L298N_INPUT_4, 1);
 }
 
+void set_hard_right_back() {
+    gpio_put(L298N_INPUT_1, 0);
+    gpio_put(L298N_INPUT_2, 0); // Right back
+    gpio_put(L298N_INPUT_3, 0); // Left forward
+    gpio_put(L298N_INPUT_4, 1);
+}
+
+void set_hard_right_forward() {
+    gpio_put(L298N_INPUT_1, 0);
+    gpio_put(L298N_INPUT_2, 0); // Right back
+    gpio_put(L298N_INPUT_3, 1); // Left forward
+    gpio_put(L298N_INPUT_4, 0);
+}
+
 // Stops the car
 void set_stop()
 {
@@ -218,29 +140,29 @@ void set_stop()
 }
 
 // Sameple Main to run the function (To be Deleted After Submission)
-// int main() {
-//     stdio_init_all();
+int main() {
+    stdio_init_all();
 
-//     l298n_speed_pwm_setup();
+    l298n_speed_pwm_setup();
 
-//     set_speed(0.5);
+    set_speed(0.5, 0.5);
 
-//     while (1)
-//     {
-//         printf("Looping...");
-//         set_forward();
+    while (1)
+    {
+        printf("Looping...");
+        set_forward();
 
-//         if(gpio_get(L298N_INPUT_1))
-//         {
-//             printf("Forward");
-//         }
-//         sleep_ms(1000);
-//         set_backward();
-//         if(gpio_get(L298N_INPUT_2))
-//         {
-//             printf("backward");
-//         }
-//         sleep_ms(1000);
+        if(gpio_get(L298N_INPUT_1))
+        {
+            printf("Forward");
+        }
+        sleep_ms(1000);
+        set_backward();
+        if(gpio_get(L298N_INPUT_2))
+        {
+            printf("backward");
+        }
+        sleep_ms(1000);
 
-//     }
-// }
+    }
+}

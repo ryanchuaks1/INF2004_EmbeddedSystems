@@ -37,6 +37,10 @@ void set_backward();
 void set_left();
 void set_right();
 void set_stop();
+void set_hard_left_back();
+void set_hard_right_back();
+void set_hard_left_forward();
+void set_hard_right_forward();
 
 static bool motor_finish = false;
 

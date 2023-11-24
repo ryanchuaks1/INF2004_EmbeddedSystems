@@ -84,6 +84,7 @@ static enum CAR_STATE car_state;
 static enum DIRECTION direction;
 static enum SENSOR_DIRECTION sensor_direction;
 static int last_left_wall_time;
-static int current_count;
+static int current_left_count;
+static int current_right_count;
 
 #endif // MAIN_H

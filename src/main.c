@@ -23,18 +23,16 @@ void wall_detected(enum SENSOR_DIRECTION sensor_direction)
 
 void decide_direction()
 {
-    printf("last bang left wall time was %d\n", last_left_wall_time);
-    printf("current time is %d\n", left_rising_edge_count);
-    printf("difference is %d\n", left_rising_edge_count - last_left_wall_time);
+    // printf("last bang left wall time was %d\n", last_left_wall_time);
+    // printf("current time is %d\n", left_rising_edge_count);
+    // printf("difference is %d\n", left_rising_edge_count - last_left_wall_time);
     if (last_left_wall_time + LEFT_TURN_THRESHOLD < left_rising_edge_count)
     {
         direction = LEFT;
-        set_left();
     }
     else
     {
         direction = RIGHT;
-        set_right();
     }
 }
 
@@ -63,14 +61,28 @@ void main_task(void *params)
         case TURNING:
             printf("Turning...\n");
             decide_direction();
-            car_state = DEBUG;
-            uint8_t turn_amount = direction == LEFT ? 4 : 6;
-            current_count = left_rising_edge_count + turn_amount;
-            while (left_rising_edge_count < current_count)
+            if (direction == RIGHT)
             {
-                printf("Current count: %d\n", left_rising_edge_count);
+                current_left_count = left_rising_edge_count;
+                set_hard_left_forward();
+                while (left_rising_edge_count < current_left_count + 5)
+                {
+                    printf("HARD LEFT");
+                }
+                last_left_wall_time = left_rising_edge_count;
+                set_forward();
             }
-            last_left_wall_time = left_rising_edge_count;
+            else
+            {
+                current_right_count = right_rising_edge_count;
+                set_hard_right_forward();
+                while (right_rising_edge_count < current_right_count + 5)
+                {
+                    printf("HARD RIGHT");
+                }
+                last_left_wall_time = right_rising_edge_count;
+                set_forward();
+            }
             car_state = MOVING;
             break;
 
