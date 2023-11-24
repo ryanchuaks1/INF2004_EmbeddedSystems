@@ -1,3 +1,8 @@
+/*
+ * Author: Wei Jun
+ * Description: Sorting algorithm (merge sort) related methods
+ */
+
 #include "../include/sorting.h"
 
 /*

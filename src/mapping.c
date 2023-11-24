@@ -1,6 +1,6 @@
 /*
  * Author: Wei Jun
- * Description: TODO: Add description
+ * Description: Mapping related methods (not pathfinding)
  */
 
 #include "../include/mapping.h"
@@ -157,7 +157,7 @@ void discover_map(struct Node* grid[MAX_ROW][MAX_COL], struct Node** car_positio
         visit_node(car_position, node_to_visit);
 
         // TODO: Check neighbours for walls, then send the wall data to the mapping message buffer.
-        
+
         // uint8_t walls_detected;
         // xMessageBufferReceive(
         //     *(global_car->components[MAPPING]->buffer),

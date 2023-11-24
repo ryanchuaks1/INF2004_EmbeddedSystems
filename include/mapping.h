@@ -1,6 +1,6 @@
 /*
  * Author: Leung Wei Jun
- * Description: TODO: Add description
+ * Description: DFS implementation on C
  */
 
 #ifndef MAPPING_H

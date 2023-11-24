@@ -1,3 +1,8 @@
+/*
+ * Author: Wei Jun
+ * Description: A* Pathfinding related methods
+ */
+
 #include "../include/pathfinding.h"
 
 /*

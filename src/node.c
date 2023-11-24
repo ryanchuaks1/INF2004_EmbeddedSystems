@@ -1,3 +1,8 @@
+/*
+ * Author: Wei Jun
+ * Description: Node related methods
+ */
+
 #include "../include/node.h"
 
 void node_init(struct Node* node){

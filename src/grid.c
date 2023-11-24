@@ -1,3 +1,8 @@
+/*
+ * Author: Wei Jun
+ * Description: Map Grid related methods
+ */
+
 #include "../include/grid.h"
 
 /*

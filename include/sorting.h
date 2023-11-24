@@ -1,6 +1,6 @@
 /*
  * Author: Leung Wei Jun
- * Description: TODO: Add description
+ * Description: Merge Sort implementation on C
  */
 
 #ifndef SORTING_H

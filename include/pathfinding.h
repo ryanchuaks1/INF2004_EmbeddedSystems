@@ -1,6 +1,6 @@
 /*
  * Author: Leung Wei Jun
- * Description: TODO: Add description
+ * Description: A* Pathfinding implementation on C
  */
 
 #ifndef PATHFINDING_H
