@@ -1,6 +1,6 @@
 /*
  * Author: Leung Wei Jun
- * Description: TODO: Add description
+ * Description: Map grid methods
  */
 
 #ifndef GRID_H

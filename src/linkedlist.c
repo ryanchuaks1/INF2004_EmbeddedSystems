@@ -1,3 +1,8 @@
+/*
+ * Author: Wei Jun
+ * Description: LinkedList related methods
+ */
+
 #include "../include/mapping.h"
 
 void insertAtHead(struct LinkedList* ll, struct Node* newNode){
@@ -24,6 +29,13 @@ void insertAtTail(struct LinkedList* ll, struct Node* newNode){
     (*ll).tail = newNode;
 }
 
+/*
+ * remove_at_head()
+ * ---------------------
+ * Purpose: Remove the head node in the linkedlist
+ * Arguments: LinkedList
+ * Returns: void
+ */
 struct Node* remove_at_head(struct LinkedList* ll){
     struct Node* removed_node = ll->head;
 
@@ -37,11 +49,16 @@ struct Node* remove_at_head(struct LinkedList* ll){
         ll->tail = NULL;
     }
 
-
-
     return removed_node;
 }
 
+/*
+ * removeNode()
+ * ---------------------
+ * Purpose: Remove a node in the LinkedList, useful if you know that this node exist in the LL and you wish to remove it.
+ * Arguments: LinkedList, and the node to be removed
+ * Returns: void
+ */
 void removeNode(struct LinkedList* ll, struct Node* node){
     struct Node *prevNode = (*node).prev;
     struct Node *nextNode = (*node).next;
@@ -64,6 +81,13 @@ void removeNode(struct LinkedList* ll, struct Node* node){
     (*node).prev = NULL;
 }
 
+/*
+ * in_ll()
+ * ---------------------
+ * Purpose: Checks if a node is in the linkedlist. Does this by traversing the linkedlist using both head and tail pointers (until they meet in the middle if the node doesnt exist)
+ * Arguments: LinkedList, and the node to be checked
+ * Returns: True = In linkedlist, False = Not in linkedlist
+ */
 bool in_ll(struct LinkedList* ll, struct Node* node){
     struct Node* head_node = ll->head;
     struct Node* tail_node = ll->tail;
@@ -104,6 +128,13 @@ bool in_ll(struct LinkedList* ll, struct Node* node){
 
 // }
 
+/*
+ * find_mid_node()
+ * ---------------------
+ * Purpose: Finds the middle node in the linked list, used for sorting algorithm (merge sort). Uses O(0.5N) operation by moving 2 pointers.
+ * Arguments: Head node of the linkedlist
+ * Returns: The address of the middle node
+ */
 struct Node* find_mid_node(struct Node* head_node){
     struct Node* mid_node = head_node;
     struct Node* end_node = head_node;
@@ -140,6 +171,13 @@ bool isEmpty(struct LinkedList* ll){
     return (*ll).head == NULL;
 }
 
+/*
+ * ll_init()
+ * ---------------------
+ * Purpose: Used after malloc(), in order to clear and set all variables to default values, to prevent seg fault.
+ * Arguments: The linked list
+ * Returns: void
+ */
 void ll_init(struct LinkedList* ll){
     if(ll == NULL){
         printf("Malloc failed. Terminating program...\n");

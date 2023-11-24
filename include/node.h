@@ -1,6 +1,6 @@
 /*
  * Author: Leung Wei Jun
- * Description: TODO: Add description
+ * Description: Node struct and its related function prototypes
  */
 
 #ifndef NODE_H
@@ -16,11 +16,13 @@ struct Coordinates{
 struct Node{
     struct Coordinates location;
 
+    // Used for storing wall information in a node.
     // N S E W
-    // 1 1 1 0
+    // 4 2 1 0 -> Decimal/Integer
+    // 1 1 1 0 -> If 1 = Wall, 0 = No wall
     uint8_t is_walled;
 
-    // BFS properties
+    // DFS properties
     bool marked;
 
     // A* properties
@@ -29,7 +31,7 @@ struct Node{
     float h_cost;
     struct Node* parent;
 
-    // LinkedList properties
+    // LinkedList properties, pointers to previous and next node
     struct Node* prev;
     struct Node* next;
 };

@@ -1,5 +1,18 @@
+/*
+ * Author: Wei Jun
+ * Description: Map Grid related methods
+ */
+
 #include "../include/grid.h"
 
+/*
+ * grid_init()
+ * ---------------------
+ * Purpose: After memory is allocated to the grid, initializes it by initializing every node in the grid as well
+ * Reason: This is because each grid only stores the address to the node, hence malloc() for the grid does not allocate memory to the struct itself.
+ * Arguments: Map grid
+ * Returns: void
+ */
 void grid_init(struct Node* grid[MAX_ROW][MAX_COL]){
     for(uint8_t i = 0; i < MAX_ROW; i++){
         for(uint8_t j = 0; j < MAX_COL; j++){
@@ -24,7 +37,6 @@ void grid_init(struct Node* grid[MAX_ROW][MAX_COL]){
 void print_grid(struct Node* grid[MAX_ROW][MAX_COL]){
     for(uint8_t i = 0; i < MAX_ROW; i++){
         for(uint8_t j = 0; j < MAX_COL; j++){
-            // printf("%c,%c,%c,%c]", (grid[i][j]->is_walled & NORTH) ? '^' : '.', (grid[i][j]->is_walled & SOUTH) ? 'V' : '.', (grid[i][j]->is_walled & EAST) ? '<' : '.', (grid[i][j]->is_walled & WEST) ? '>' : '.');
             printf("%s", (grid[i][j]->is_walled & NORTH) ? "----" : "    ");
         }
         printf("\n");
@@ -42,6 +54,13 @@ void print_grid(struct Node* grid[MAX_ROW][MAX_COL]){
     }
 }
 
+/*
+ * add_wall()
+ * ---------------------
+ * Purpose: This function is called when a wall needs to be added on the node. If you add a west wall on the node, then the neighbouring left node's east wall also needs to be added.
+ * Argument: Map grid, the node to add the wall on, which wall to add (North, South, East, West wall)
+ * Returns: void
+ */
 void add_wall(struct Node* grid[MAX_ROW][MAX_COL], struct Node* node, uint8_t wall_direction){
     node->is_walled |= wall_direction;
 
