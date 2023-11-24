@@ -1,3 +1,8 @@
+/*
+ * Author: Wei Jun
+ * Description: LinkedList related methods
+ */
+
 #include "../include/mapping.h"
 
 void insertAtHead(struct LinkedList* ll, struct Node* newNode){
