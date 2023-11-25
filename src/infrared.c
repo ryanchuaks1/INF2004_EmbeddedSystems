@@ -15,9 +15,9 @@
  */
 void infrared_task(void* params)
 {
-    //Initialise Left sensor pin
     struct Car* car = (struct Car*)params;
-    printf("Hello\n");
+
+    //Initialise Left sensor pin
     struct Sensor_Data* left_sensor = (struct Sensor_Data*)malloc(sizeof(struct Sensor_Data));
     sensor_data_init(left_sensor);
     left_sensor->pin = LEFT_IR_SENSOR_PIN;
@@ -28,6 +28,7 @@ void infrared_task(void* params)
     sensor_data_init(right_sensor);
     right_sensor->pin = RIGHT_IR_SENSOR_PIN;
     ir_sensor_init(right_sensor->pin);
+    
     uint16_t duration_ms = 10000;
 
     while(true){
