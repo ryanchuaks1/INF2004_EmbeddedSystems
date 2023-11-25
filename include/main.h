@@ -54,8 +54,6 @@ void component_init(struct Component* component);
 void main_task(void* params);
 void car_init(struct Car* car);
 void set_direction(enum DIRECTION dir);
-
-int64_t reverse_and_change(alarm_id_t id, void *user_data);
 void turn_with_interrupts(struct Car* car, enum DIRECTION direction, uint16_t no_of_interrupts);
 
 
