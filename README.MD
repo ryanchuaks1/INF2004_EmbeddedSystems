@@ -4,6 +4,9 @@ Welcome to the **Team 55** Car Project repository. This repo contains our source
 ## Table of Contents
 - [Introduction](#introduction)
 - [Getting Started](#getting-started)
+- [Architecture Guidelines](#architecture-guidelines)
+- [Documentations](#documentations)
+- [Branches](#branches)
 
 ## Introduction
 
@@ -31,5 +34,13 @@ To get started with this car project, follow these steps:
 
 ## Architecture Guidelines
 
-The brain/main of the project is in main.c file. The project is running under FreeRTOS and hence, most of the components are seperated into task. Each component has thier own file.    <br>     
+The brain/main of the project is in main.c file. The project is running under FreeRTOS and hence, most of the components are seperated into task. Each component has their own file.    <br>     
 Task with the same priority does round robin however, higher priority task will always take the CPU first. Interrupts are always handled first before task.
+
+## Documentations
+
+The Proposals, Block Diagram and Flow Chars are in the "dragrams_and_proposal" Folder.
+
+## Branches
+
+The main branch is the official branch for this project, the other branches are archives. 
