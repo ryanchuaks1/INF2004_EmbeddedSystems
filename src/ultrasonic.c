@@ -1,15 +1,22 @@
 #include "../include/ultrasonic.h"
 
-// Set to the actual system clock frequency
-// Measure the distance in centimeters
+//Repeating Timer for Ultrasonic
 struct repeating_timer ultrasonic_timer;
 
+/**
+ * measure_distance()
+ * --------
+ * Purpose: Measure the distance between the ultrasonic sensor and the object
+ * Arguments: None
+ * Return: a valid distance or else, return -1
+ */
 float measure_distance()
 {
 	// Set the trigger pin high for 10 microseconds
 	gpio_put(TRIG_PIN, 1);
 	busy_wait_us(10); // Sleep for 10 milliseconds, Generate a precise delay of 10 microseconds (Use Busy Wait as we dont want any process using the 10ms or will cuase in accuracy)
 	gpio_put(TRIG_PIN, 0);
+
 	// When trigger pin has bin triggered, the echo pin will be high and a pulse will be emmited
 	// Wait for the echo pin to go high
 	while (gpio_get(ECHO_PIN) == 0) tight_loop_contents();
@@ -39,6 +46,13 @@ float measure_distance()
 	return distance_cm > 398 || distance_cm < 4 ? -1 : distance_cm;
 }
 
+/**
+ * ultrasonic_init()
+ * --------
+ * Purpose: Initializes the pins for ultrasonic
+ * Arguments: None
+ * Return: None
+ */
 void ultrasonic_init()
 {
 	// Initialize trigger and echo pins
@@ -48,6 +62,14 @@ void ultrasonic_init()
 	gpio_set_dir(ECHO_PIN, GPIO_IN);
 }
 
+/**
+ * measure_ultrasonic(struct repeating_timer *t) 
+ * --------
+ * Purpose: Reads if there is an obstacle infront of the Ultrasonic
+ *          If there is, tell the PID to change to an OBJECT State
+ * Arguments: Repeating timer used
+ * Return: true
+ */
 bool measure_ultrasonic(struct repeating_timer *t) 
 {
     float distance = measure_distance();
@@ -55,6 +77,8 @@ bool measure_ultrasonic(struct repeating_timer *t)
     if (distance > 0 && distance <= TRIGGERED_DISTANCE)
     {
         uint8_t message = ULTRASONIC;
+
+        //Sends a message to tell the PID to change state to if there is an obstacle
         xMessageBufferSend(
             *(global_car->main_buffer),
             (void *)&message,
@@ -70,6 +94,13 @@ bool measure_ultrasonic(struct repeating_timer *t)
     return true;
 }
 
+/**
+ * ultrasonic_task()
+ * --------
+ * Purpose: Task used to Run the Ultrasonic
+ * Arguments: Parameters from the Task
+ * Return: None
+ */
 void ultrasonic_task(void* params)
 {
     printf("Start Ultrasonic\n");
@@ -81,6 +112,8 @@ void ultrasonic_task(void* params)
         printf("Run Functions\n");
         struct Car* car = (struct Car*)params;
         uint16_t duration_ms = 10000;
+
+        //Wait for a message to before starting to meaure the ultrasonic
         xMessageBufferReceive(
             *(car->components[ULTRASONIC]->buffer), 
             &duration_ms, 

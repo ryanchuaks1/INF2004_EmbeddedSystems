@@ -159,25 +159,34 @@ void state_execute(struct Car *car)
     * and move the car at a slow but constant speed.
     */
     case TRANSIT:
+
+        //Send message to the components that they can start sensing, we send the duration planned for the car in transit state for the components if they need it
         xBytesSent = xMessageBufferSend(
             *(car->components[INFRARED]->buffer),
             (void *)&duration_ms,
             sizeof(duration_ms),
             0);
+
         xBytesSent = xMessageBufferSend(
             *(car->components[ULTRASONIC]->buffer),
             (void *)&duration_ms,
             sizeof(duration_ms),
             0);
+
+        //Set the car to move at the direction specified
         uint32_t start_time_us = time_us_32();
         set_direction(direction);
         set_speed(car->duty_cycle, car->wheels_ratio);
+
+        //Recieve any opcodes from the components
         xMessageBufferReceive(
             *(car->main_buffer),
             (void *)&opcode,
             sizeof(opcode),
             pdMS_TO_TICKS(duration_ms));
         printf("Received: %f\n", (float)(time_us_32() - start_time_us) / 1000);
+
+        //Process the opcodes and switch states if needed
         if (opcode == BARCODE)
         {
             duration_ms -= (time_us_32() - start_time_us) / 1000;
@@ -192,12 +201,9 @@ void state_execute(struct Car *car)
             turn_with_interrupts(car, RIGHT, turn_interrupt_count);
             turn_with_interrupts(car, FORWARD, turn_interrupt_count);
             change_state(car, IDLE);
-            // direction = RIGHT;
-            //  change_state(car, ADJUST);
         }
         else if (opcode == ULTRASONIC)
         {
-            // duration_ms -= (time_us_32() - start_time_us) / 1000;
             printf("Activate Ultraconic State....");
             change_state(car, OBSTACLE);
         }
@@ -207,30 +213,17 @@ void state_execute(struct Car *car)
             change_state(car, IDLE);
         }
 
-        // else{
-        //     printf("Error occured, received: %d\n", opcode);
-        // }
-
         break;
     /*
     * ADJUST state
     * ---------------------
-    * Purpose: State for adjusting the car to the right direction
+    * Purpose: State for adjusting the car to the direction specified
     */
     case ADJUST:
-        starting_left_count = left_rising_edge_count;
-        starting_right_count = right_rising_edge_count;
-        set_direction(direction);
-        set_speed(car->duty_cycle, car->wheels_ratio);
 
-        while (((left_rising_edge_count - starting_left_count) < turn_interrupt_count) &&
-               ((right_rising_edge_count - starting_right_count) < turn_interrupt_count))
-        {
-            vTaskDelay(pdMS_TO_TICKS(10));
-        }
-
-        set_stop();
+        turn_with_interrupts(car, direction, turn_interrupt_count);    
         change_state(car, IDLE);
+
         break;
     /*
     * SCANNING state
@@ -272,28 +265,25 @@ void state_execute(struct Car *car)
     */
     case OBSTACLE:
         printf("Inside Obstacle state\n");
-        // set_stop();
-        // set_speed(car->duty_cycle, car->wheels_ratio);
-        // turn_with_interrupts(car, LEFT, U_TURN_INTERRUPT);
-        // set_stop();
+
+        //Reverse the Car for 2 seconds upon obstacle detection
         set_speed(car->duty_cycle, car->wheels_ratio);
         set_direction(BACKWARD);
         vTaskDelay(pdMS_TO_TICKS(2000));
-        // add_alarm_in_ms(2000, reverse_and_change, NULL, false);
         set_stop();
+
         change_state(car, IDLE);
         break;
     }
 }
 
-int64_t reverse_and_change(alarm_id_t id, void *user_data)
-{
-    printf("End of Obstacle State...\n");
-    set_stop();
-    change_state(global_car, IDLE);
-    return 0;
-}
-
+/*
+ * turn_with_interrupts()
+ * ---------------------
+ * Purpose: Turns the Car to Left or Right in 90 degrees
+ * Arguments: car struct, the direction and the number of interrupts to stop turning
+ * Returns: None
+ */
 void turn_with_interrupts(struct Car *car, enum DIRECTION direction, uint16_t no_of_interrupts)
 {
     uint16_t starting_left_count = left_rising_edge_count;
@@ -302,6 +292,8 @@ void turn_with_interrupts(struct Car *car, enum DIRECTION direction, uint16_t no
     set_direction(direction);
     set_speed(car->duty_cycle, car->wheels_ratio);
 
+    //We use the Interrupt count to turn the wheels
+    //From testing, around 10 interrupts are needed for our to turn 90 degrees
     while (((left_rising_edge_count - starting_left_count) < no_of_interrupts) &&
            ((right_rising_edge_count - starting_right_count) < no_of_interrupts))
     {
@@ -368,6 +360,13 @@ void change_state(struct Car *car, enum PID_STATE next_state)
     state_enter(car);
 }
 
+/*
+ * car_init()
+ * ---------------------
+ * Purpose: Checks if the car struct exist and sets the default values
+ * Arguments: car struct
+ * Returns: void
+ */
 void car_init(struct Car *car)
 {
     if (car == NULL)
@@ -388,38 +387,19 @@ void car_init(struct Car *car)
     }
 }
 
+/*
+ * components_init()
+ * ---------------------
+ * Purpose: create component struct and Task Handler for each components
+ * Arguments: List of Components
+ * Returns: void
+ */
 void components_init(struct Component *components[COMPONENTS_COUNT])
 {
     for (uint8_t i = 0; i < COMPONENTS_COUNT; i++)
     {
         components[i] = (struct Component *)malloc(sizeof(struct Component));
         component_init(components[i]);
-
-        // switch(i){
-        //     case BARCODE:
-        //         components[i]->buffer = &barcode_buffer;
-        //         break;
-        //     case INFRARED:
-        //         components[i]->buffer = &infrared_buffer;
-        //         break;
-        //     case MAGNETOMETER:
-        //         components[i]->buffer = &magnetometer_buffer;
-        //         break;
-        //     case MAPPING:
-        //         components[i]->buffer = &mapping_buffer;
-        //         break;
-        //     case MOTOR:
-        //         components[i]->buffer = &test_buffer;
-        //         break;
-        //     case ULTRASONIC:
-        //         components[i]->buffer = &ultrasonic_buffer;
-        //         break;
-        //     case WHEEL_ENCODER:
-        //         components[i]->buffer = &wheel_encoder_buffer;
-        //         break;
-        // }
-
-        // printf("Component: %d, Buffer address: %p\n", i, components[i]->buffer);
 
         components[i]->task_handler = (TaskHandle_t *)malloc(sizeof(TaskHandle_t));
         if (components[i]->task_handler == NULL)
@@ -430,6 +410,13 @@ void components_init(struct Component *components[COMPONENTS_COUNT])
     }
 }
 
+/*
+ * component_init()
+ * ---------------------
+ * Purpose: For the component struct, as its variables to the default values
+ * Arguments: Component Struct
+ * Returns: void
+ */
 void component_init(struct Component *component)
 {
     if (component == NULL)
