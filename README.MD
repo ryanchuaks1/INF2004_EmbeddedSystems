@@ -4,6 +4,9 @@ Welcome to the **Team 55** Car Project repository. This repo contains our source
 ## Table of Contents
 - [Introduction](#introduction)
 - [Getting Started](#getting-started)
+- [Architecture Guidelines](#architecture-guidelines)
+- [Documentations](#documentations)
+- [Branches](#branches)
 
 ## Introduction
 
