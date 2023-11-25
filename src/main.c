@@ -7,6 +7,13 @@
 
 struct Car *global_car;
 
+/*
+ * state_enter()
+ * ---------------------
+ * Purpose: Runs when transitioning into a new state. What it runs is dependent on the current state
+ * Arguments: car struct
+ * Returns: void
+ */
 void state_enter(struct Car *car)
 {
     switch (*(car->state))
@@ -29,11 +36,19 @@ void reset_msg_from_cgi()
     message_cgi_direction = CGI_NULL_DIRECTION;
 }
 
+/*
+ * state_execute()
+ * ---------------------
+ * Purpose: Runs continuously inside the main_task. What it runs is dependent on the current state
+ * Arguments: car struct
+ * Returns: void
+ */
 void state_execute(struct Car *car)
 {
     size_t xBytesSent;
     size_t xBytesReceived;
 
+    // for identifying the component which sends the message into the buffer
     uint8_t opcode = 10;
 
     uint16_t starting_left_count;
@@ -42,10 +57,16 @@ void state_execute(struct Car *car)
     static uint16_t duration_ms = 10000;
     static enum DIRECTION direction = FORWARD;
 
+    // number of interrupts on the wheel encoder to complete a turn
     uint8_t turn_interrupt_count = 10;
 
     switch (*(car->state))
     {
+    /*
+    * IDLE state
+    * ---------------------
+    * Purpose: For setting up/configuring/initializing the car. Set the duty cycle and calibrate the car before it starts moving
+    */
     case IDLE:
         printf("Main Menu. 1 = Change duty cycle, 2 = Calibrate wheels, 3 = Start car\n");
         switch (message_cgi)
@@ -127,6 +148,16 @@ void state_execute(struct Car *car)
 
         vTaskDelay(pdMS_TO_TICKS(1500)); // Poll every 1.5 seconds
         break;
+    /*
+    * TRANSIT state
+    * ---------------------
+    * Purpose: This state is only used when the car is in transit (moving), it will send messages to the different components
+    * to start taking measurements, and listen for messages while the car is in transit (so that the TRANSIT state can be interrupted)
+    * 1. If we receive a message from INFRARED, it means that we have detected a black line, so we reverse our car and turn
+    * 2. If we receive a message from ULTRASONIC, it means that we have detected an object, hence the car needs to reverse
+    * 3. If we receive a message from BARCODE, it means that we have detected a barcode, hence we reverse the car, ask the barcode to start reading
+    * and move the car at a slow but constant speed.
+    */
     case TRANSIT:
         xBytesSent = xMessageBufferSend(
             *(car->components[INFRARED]->buffer),
@@ -181,6 +212,11 @@ void state_execute(struct Car *car)
         // }
 
         break;
+    /*
+    * ADJUST state
+    * ---------------------
+    * Purpose: State for adjusting the car to the right direction
+    */
     case ADJUST:
         starting_left_count = left_rising_edge_count;
         starting_right_count = right_rising_edge_count;
@@ -196,6 +232,12 @@ void state_execute(struct Car *car)
         set_stop();
         change_state(car, IDLE);
         break;
+    /*
+    * SCANNING state
+    * ---------------------
+    * Purpose: Car will reverse and task the barcode_task to start reading for inputs, then we move the car at a constant speed to read
+    * the barcode.
+    */
     case SCANNING:
         set_direction(BACKWARD);
         set_speed(car->duty_cycle, car->wheels_ratio);
@@ -223,6 +265,11 @@ void state_execute(struct Car *car)
             change_state(car, IDLE);
         }
         break;
+    /*
+    * OBSTACLE state
+    * ---------------------
+    * Purpose: Reverses the car upon the detection of obstacles.
+    */
     case OBSTACLE:
         printf("Inside Obstacle state\n");
         // set_stop();
@@ -264,6 +311,13 @@ void turn_with_interrupts(struct Car *car, enum DIRECTION direction, uint16_t no
     set_stop();
 }
 
+/*
+ * state_exit()
+ * ---------------------
+ * Purpose: Runs the exit function for the current state when transitioning into a new state.
+ * Arguments: car struct
+ * Returns: void
+ */
 void state_exit(struct Car *car)
 {
     switch (*(car->state))
@@ -283,6 +337,16 @@ void state_exit(struct Car *car)
     }
 }
 
+/*
+ * change_state()
+ * ---------------------
+ * Purpose: Called when the car needs to change from 1 state or the other.
+ * 1. Runs the exit function for the current state
+ * 2. Set the current state to be the next state (execute() will be run by the main_task automatically)
+ * 3. Runs the entry function for the next state
+ * Arguments: car struct, and the enum for the next state
+ * Returns: void
+ */
 void change_state(struct Car *car, enum PID_STATE next_state)
 {
     if (car->state != NULL)
@@ -381,6 +445,15 @@ void component_init(struct Component *component)
     }
 }
 
+/*
+ * main_task()
+ * ---------------------
+ * Purpose: The main task for the car
+ * 1. Set car state to IDLE
+ * 2. Always runs the execute() function
+ * Arguments: car struct
+ * Returns: void
+ */
 void main_task(void *params)
 {
     struct Car *car = (struct Car *)params;
