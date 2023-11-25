@@ -462,18 +462,18 @@ int main()
     car->position = (struct Node **)malloc(sizeof(struct Node *));
     *(car->position) = car->grid[START_NODE_X][START_NODE_Y];
 
-    add_wall(grid, grid[3][3], SOUTH | EAST);
-    add_wall(grid, grid[2][3], EAST | WEST);
-    add_wall(grid, grid[1][3], EAST | WEST);
-    add_wall(grid, grid[0][3], WEST);
-    add_wall(grid, grid[3][2], WEST | SOUTH);
-    add_wall(grid, grid[2][2], WEST);
-    add_wall(grid, grid[1][2], WEST);
-    add_wall(grid, grid[0][3], WEST);
-    add_wall(grid, grid[0][1], WEST);
-    add_wall(grid, grid[1][1], WEST);
-    add_wall(grid, grid[2][1], WEST);
-    add_wall(grid, grid[3][1], WEST);
+    add_wall(car->grid, car->grid[3][3], SOUTH | EAST);
+    add_wall(car->grid, car->grid[2][3], EAST | WEST);
+    add_wall(car->grid, car->grid[1][3], EAST | WEST);
+    add_wall(car->grid, car->grid[0][3], WEST);
+    add_wall(car->grid, car->grid[3][2], WEST | SOUTH);
+    add_wall(car->grid, car->grid[2][2], WEST);
+    add_wall(car->grid, car->grid[1][2], WEST);
+    add_wall(car->grid, car->grid[0][3], WEST);
+    add_wall(car->grid, car->grid[0][1], WEST);
+    add_wall(car->grid, car->grid[1][1], WEST);
+    add_wall(car->grid, car->grid[2][1], WEST);
+    add_wall(car->grid, car->grid[3][1], WEST);
 
     vLaunch(car);
 }
