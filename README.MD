@@ -39,7 +39,7 @@ Task with the same priority does round robin however, higher priority task will 
 
 ## Documentations
 
-The Proposals, Block Diagram and Flow Chars are in the "dragrams_and_proposal" Folder.
+The Proposals, Block Diagram and Flow Chars are in the "diagrams_and_proposal" Folder.
 
 ## Branches
 
