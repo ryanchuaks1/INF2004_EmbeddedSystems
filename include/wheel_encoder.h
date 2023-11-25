@@ -22,8 +22,6 @@ struct Wheel_Encoder_Flags{
     volatile uint8_t right_rising_edge_count;
 };
 
-volatile static uint8_t encoder_interrupt_count = 0;
-
 extern uint16_t left_rising_edge_count;
 extern uint16_t right_rising_edge_count;
 

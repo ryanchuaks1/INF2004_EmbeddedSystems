@@ -94,31 +94,5 @@ void ultrasonic_task(void* params)
         vTaskDelay(pdMS_TO_TICKS(POLLING_TIME_MS));
 
         add_repeating_timer_ms(-(POLLING_TIME_MS), measure_ultrasonic, NULL, &ultrasonic_timer);
-        
-        // //After recieving the duratuon, we know to start the function
-        // uint32_t end_time = time_us_32() + duration_ms;
-
-        // while (time_us_32() < end_time)
-        // {
-        //     distance = measure_distance();
-        //     printf("Distance measured: %.2f\n", distance);
-        //     if (distance > 0 && distance >= TRIGGERED_DISTANCE)
-        //     {
-        //         uint8_t message = ULTRASONIC;
-        //         xMessageBufferSend(
-        //             *(global_car->main_buffer),
-        //             (void *)&message,
-        //             sizeof(message),
-        //             portMAX_DELAY
-        //         );
-
-        //         printf("Obstacle detected, changing state\n");
-        //     }
-
-        //     vTaskDelay(pdMS_TO_TICKS(POLLING_TIME_MS));
-        // } 
-
-        // printf("Finish Ultrasonic...\n");
-    }
-    
+    }   
 }
