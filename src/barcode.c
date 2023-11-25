@@ -5,73 +5,73 @@
 
 #include "../include/barcode.h"
 
-void barcode_task(void *params)
-{
-    struct Car* car = (struct Car*)params;
-    barcode_init(); // Initialise barcode scanner,
+// void barcode_task(void *params)
+// {
+//     struct Car* car = (struct Car*)params;
+//     barcode_init(); // Initialise barcode scanner,
 
-    uint8_t opcode = 10;
+//     uint8_t opcode = 10;
 
-    while (true)
-    {
-        xMessageBufferReceive
-        (
-            *(car->components[BARCODE]->buffer),
-            (void*)&opcode,
-            sizeof(opcode),
-            portMAX_DELAY
-        );
+//     while (true)
+//     {
+//         xMessageBufferReceive
+//         (
+//             *(car->components[BARCODE]->buffer),
+//             (void*)&opcode,
+//             sizeof(opcode),
+//             portMAX_DELAY
+//         );
 
-        printf("the opcode is: %d", opcode);
+//         printf("the opcode is: %d", opcode);
 
-        // if(opcode == BARCODE){
+//         // if(opcode == BARCODE){
 
-        // }
+//         // }
 
-        while (barcodeFlags.isBarcode)
-        {
-            uint16_t reading = adc_read();
-            printf("Reading: %d\n", reading);
+//         while (barcodeFlags.isBarcode)
+//         {
+//             uint16_t reading = adc_read();
+//             printf("Reading: %d\n", reading);
 
-            if (reading > BARCODE_THRESHOLD && !barcodeFlags.isPrevBlackBar)
-            {
-                barcodeFlags.isPrevBlackBar = true;
-                int timing = time_us_64() - last_button_press_time;
-                black_bar_times[bar_index] = timing;
-            }
-            else if (reading < BARCODE_THRESHOLD && barcodeFlags.isPrevBlackBar)
-            {
-                barcodeFlags.isPrevBlackBar = false;
-                int timing = time_us_64() - last_button_press_time;
-                white_bar_times[bar_index] = timing;
-                bar_index++;
-            }
-            if (white_bar_times[4] != 0)
-            {
-                decode_barcode(black_bar_times, white_bar_times);
-                barcodeFlags.isPrevBlackBar = false;
-                white_bar_times[4] = 0;
-                bar_index = 0;
-            }
-            if (barcodeFlags.limitter > BARCODE_CHAR_LIMIT)
-            {
-                reset_barcode_params();
-                //vTaskDelete(NULL);
-            }
-            vTaskDelay(pdMS_TO_TICKS(10));
-        }
+//             if (reading > BARCODE_THRESHOLD && !barcodeFlags.isPrevBlackBar)
+//             {
+//                 barcodeFlags.isPrevBlackBar = true;
+//                 int timing = time_us_64() - last_button_press_time;
+//                 black_bar_times[bar_index] = timing;
+//             }
+//             else if (reading < BARCODE_THRESHOLD && barcodeFlags.isPrevBlackBar)
+//             {
+//                 barcodeFlags.isPrevBlackBar = false;
+//                 int timing = time_us_64() - last_button_press_time;
+//                 white_bar_times[bar_index] = timing;
+//                 bar_index++;
+//             }
+//             if (white_bar_times[4] != 0)
+//             {
+//                 decode_barcode(black_bar_times, white_bar_times);
+//                 barcodeFlags.isPrevBlackBar = false;
+//                 white_bar_times[4] = 0;
+//                 bar_index = 0;
+//             }
+//             if (barcodeFlags.limitter > BARCODE_CHAR_LIMIT)
+//             {
+//                 reset_barcode_params();
+//                 //vTaskDelete(NULL);
+//             }
+//             vTaskDelay(pdMS_TO_TICKS(10));
+//         }
 
-        xMessageBufferSend
-        (
-            *(car->main_buffer),
-            (void*)&opcode,
-            sizeof(opcode),
-            portMAX_DELAY
-        );
-        
-        vTaskDelay(pdMS_TO_TICKS(1000));
-    }
-}
+//         xMessageBufferSend
+//         (
+//             *(car->main_buffer),
+//             (void*)&opcode,
+//             sizeof(opcode),
+//             portMAX_DELAY
+//         );
+
+//         vTaskDelay(pdMS_TO_TICKS(1000));
+//     }
+// }
 
 void reset_barcode_params()
 {
@@ -79,10 +79,7 @@ void reset_barcode_params()
     barcodeFlags.isBarcode = false;
     barcodeFlags.count = 0;
     barcodeFlags.limitter = 0;
-    barType = BLACK_BAR;
     last_button_press_time = 0;
-    coded_barcode = 0;
-    decoded_barcode = 0;
     bar_index = 0;
     gpio_set_irq_enabled_with_callback(WALL_SENSOR_PIN, GPIO_IRQ_EDGE_RISE, true, &interrupt_callback); // enable rising edge interrupt
 }
@@ -109,8 +106,7 @@ void alarm_callback()
             *(global_car->main_buffer),
             (void *)&message,
             sizeof(message),
-            portMAX_DELAY
-        );
+            portMAX_DELAY);
         printf("Wall detected please reverse robot\n");
     }
 }
@@ -128,7 +124,7 @@ void check_if_wall()
         {
             // Disable interrupt and set flag
             gpio_set_irq_enabled_with_callback(WALL_SENSOR_PIN, GPIO_IRQ_EDGE_RISE, false, &interrupt_callback); // enable rising edge interrupt
-            // barcodeFlags.isBarcode = true;
+            barcodeFlags.isBarcode = true;
 
             // uint8_t message = BARCODE;
             // xMessageBufferSend(
@@ -140,15 +136,15 @@ void check_if_wall()
 
             printf("Barcode Detected please reverse robot\n");
             // TODO: Tell main to stop motors and reverse
-            //init_read_barcode();
+            // init_read_barcode();
         }
     }
 }
 
-// void init_read_barcode()
-// {
-//     xTaskCreate(read_barcode, "read_barcode", 1024, NULL, 1, NULL);
-// }
+void init_read_barcode()
+{
+    xTaskCreate(read_barcode, "read_barcode", 1024, NULL, 1, NULL);
+}
 
 void decode_barcode(int black_bar_times[], int white_bar_times[])
 {
@@ -219,8 +215,6 @@ void decode_barcode(int black_bar_times[], int white_bar_times[])
             dec_white_bar_times[i] = 0;
         }
     }
-    barcodeFlags.limitter++;
-    printf("\nthis is the %d time\n", barcodeFlags.limitter);
     printf("Black bar times: %d %d %d %d %d\n", dec_black_bar_times[0], dec_black_bar_times[1], dec_black_bar_times[2], dec_black_bar_times[3], dec_black_bar_times[4]);
     printf("White bar times: %d %d %d %d\n\n", dec_white_bar_times[0], dec_white_bar_times[1], dec_white_bar_times[2], dec_white_bar_times[3]);
     barcode_to_char(dec_black_bar_times, dec_white_bar_times);
@@ -263,12 +257,16 @@ void barcode_to_char(int black_bar_times[], int white_bar_times[])
         result += 29;
 
     printf("Result: %d\n", result);
-    char decoded_char = code_39_characters[result];
+    decoded_char = code_39_characters[result];
+    if (decoded_char == '*')
+    {
+        barcodeFlags.limitter++;
+    }
     printf("Decoded character: %c\n", decoded_char);
 }
 
 void read_barcode()
-{        
+{
     vTaskDelay(pdMS_TO_TICKS(1000));
     while (barcodeFlags.isBarcode)
     {
@@ -295,7 +293,7 @@ void read_barcode()
             white_bar_times[4] = 0;
             bar_index = 0;
         }
-        if (barcodeFlags.limitter > BARCODE_CHAR_LIMIT)
+        if (barcodeFlags.limitter == 2)
         {
             reset_barcode_params();
             vTaskDelete(NULL);

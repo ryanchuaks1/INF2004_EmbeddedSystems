@@ -80,5 +80,6 @@ static int bar_index = 0;                          // Index for the current bar
 
 static char code_39_characters[] = "1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ-. *"; // Array of characters for code 39
 
+extern char decoded_char;
 
 #endif // BARCODE_H
