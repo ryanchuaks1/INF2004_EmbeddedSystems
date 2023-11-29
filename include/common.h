@@ -39,7 +39,7 @@
 #define EAST 0x2u
 #define WEST 0x1u
 
-#define COMPONENTS_COUNT 7
+#define COMPONENTS_COUNT 8
 
 
 enum COMPONENT_NAME{
@@ -49,7 +49,8 @@ enum COMPONENT_NAME{
     MAPPING,
     MOTOR,
     ULTRASONIC,
-    WHEEL_ENCODER
+    WHEEL_ENCODER,
+    PATHFINDING
 };
 
 struct Component{

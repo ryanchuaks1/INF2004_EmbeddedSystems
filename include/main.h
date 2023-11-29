@@ -40,6 +40,7 @@
 #define MOTOR_TASK_PRIORITY				        ( tskIDLE_PRIORITY + 1UL )
 #define ULTRASONIC_TASK_PRIORITY				( tskIDLE_PRIORITY + 1UL )
 #define WHEEL_ENCODER_TASK_PRIORITY				( tskIDLE_PRIORITY + 1UL )
+#define PATHFINDING_TASK_PRIORITY				( tskIDLE_PRIORITY + 1UL )
 
 // size of the message buffer
 #define mbaTASK_MESSAGE_BUFFER_SIZE		( 60 )
