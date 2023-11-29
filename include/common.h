@@ -24,15 +24,15 @@
 #include "lwip/apps/httpd.h"
 #include "pico/cyw43_arch.h"
 
-#define MAX_ROW 5
-#define MAX_COL 5
+#define MAX_ROW 4
+#define MAX_COL 6
 #define WALL_MASK 0x0F
 
-#define START_NODE_X 4
-#define START_NODE_Y 4
+#define START_NODE_X 2
+#define START_NODE_Y 0
 
-#define END_NODE_X 0
-#define END_NODE_Y 0
+#define END_NODE_X 1
+#define END_NODE_Y 5
 
 #define NORTH 0x8u
 #define SOUTH 0x4u
@@ -63,6 +63,7 @@ struct Car{
     struct Node** position;
     enum PID_STATE* state;
     struct Node* grid[MAX_ROW][MAX_COL];
+    struct Node* explored_grid[MAX_ROW][MAX_COL];
     struct Component* components[COMPONENTS_COUNT];
     float wheels_ratio;
     float duty_cycle;

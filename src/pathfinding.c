@@ -21,7 +21,7 @@ void pathfinding_task(void* params){
     while (true)
     {
         xMessageBufferReceive(
-            *(car->components[MAPPING]->buffer),
+            *(car->components[PATHFINDING]->buffer),
             (void *)&enabled,
             sizeof(enabled),
             portMAX_DELAY
@@ -29,10 +29,11 @@ void pathfinding_task(void* params){
 
         if (enabled)
         {
-            struct LinkedList *path = compute_path(car->grid, car->grid[4][4], car->grid[0][0]);
+            struct LinkedList *path = compute_path(car->grid, car->grid[START_NODE_X][START_NODE_Y], car->grid[END_NODE_X][END_NODE_Y]);
             if (path != NULL)
             {
-                print_ll(path);
+                //print_ll(path);
+                print_pathfinding_grid(car->grid, path);
             }
             free(path);
             enabled = false;
@@ -151,6 +152,8 @@ struct LinkedList* compute_path(struct Node* grid[MAX_ROW][MAX_COL], struct Node
         removeNode(open_list, curr_node);
 
         if (curr_node == end_node){
+            free(open_list);
+            free(closed_list);
             return generate_path(end_node, start_node);
         }
 
@@ -207,10 +210,37 @@ struct LinkedList* compute_path(struct Node* grid[MAX_ROW][MAX_COL], struct Node
         }
 
         insertAtTail(closed_list, curr_node);
-        sort_f_cost(open_list);
+        if(!isEmpty(open_list)){
+            sort_f_cost(open_list);
+        }
     }
 
     free(open_list);
     free(closed_list);
+    printf("No paths found!\n");
     return NULL;
+}
+
+void print_pathfinding_grid(struct Node* grid[MAX_ROW][MAX_COL], struct LinkedList* path){
+    for(uint8_t i = 0; i < MAX_ROW; i++){
+        for(uint8_t j = 0; j < MAX_COL; j++){
+            printf("%s", (grid[i][j]->is_walled & NORTH) ? "----" : "    ");
+        }
+        printf("\n");
+        for(uint8_t j = 0; j < MAX_COL; j++){
+            if(in_ll(path, grid[i][j])){
+                printf("%cxx%c", (grid[i][j]->is_walled & WEST) ? '|' : ' ', (grid[i][j]->is_walled & EAST) ? '|' : ' ');
+            }
+            else{
+                printf("%c  %c", (grid[i][j]->is_walled & WEST) ? '|' : ' ', (grid[i][j]->is_walled & EAST) ? '|' : ' ');
+            }
+        }
+        printf("\n");
+        if(i == MAX_ROW-1){
+            for(uint8_t j = 0; j < MAX_COL; j++){
+                printf("%s", (grid[i][j]->is_walled & SOUTH) ? "----" : "    ");
+            }
+            printf("\n");
+        }
+    }
 }

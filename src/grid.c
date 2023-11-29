@@ -13,23 +13,27 @@
  * Arguments: Map grid
  * Returns: void
  */
-void grid_init(struct Node* grid[MAX_ROW][MAX_COL]){
+void grid_init(struct Node* grid[MAX_ROW][MAX_COL], bool exploring){
     for(uint8_t i = 0; i < MAX_ROW; i++){
         for(uint8_t j = 0; j < MAX_COL; j++){
-            grid[i][j] = (struct Node*)malloc(sizeof(struct Node));
+            if(!exploring){
+                grid[i][j] = (struct Node*)malloc(sizeof(struct Node));
 
-            node_init(grid[i][j]);
+                node_init(grid[i][j]);
 
-            grid[i][j]->location.x = i;
-            grid[i][j]->location.y = j;
-            
-            // wall off the north/south walls of the nodes at the border of the grid (if they're not the start or the end node)
-            if( ! ( ( (i == START_NODE_X) && (j == START_NODE_Y) ) || ( (i == END_NODE_X) && (j == END_NODE_Y) ) ) ){
-                grid[i][j]->is_walled |= ((i == 0) ? NORTH : 0) | ((i == MAX_ROW-1) ? SOUTH : 0);
+                grid[i][j]->location.x = i;
+                grid[i][j]->location.y = j;
+                
+                // wall off the north/south walls of the nodes at the border of the grid (if they're not the start or the end node)
+                // wall off the east/west walls of the nodes at the border of the grid
+                if( ! ( ( (i == START_NODE_X) && (j == START_NODE_Y) ) || ( (i == END_NODE_X) && (j == END_NODE_Y) ) ) ){
+                    grid[i][j]->is_walled |= ((i == 0) ? NORTH : 0) | ((i == MAX_ROW-1) ? SOUTH : 0);
+                    grid[i][j]->is_walled |= ((j == 0) ? WEST : 0) | ((j == MAX_COL-1) ? EAST : 0);
+                }
             }
-
-            // wall off the east/west walls of the nodes at the border of the grid
-            grid[i][j]->is_walled |= ((j == 0) ? WEST : 0) | ((j == MAX_COL-1) ? EAST : 0);
+            else{
+                grid[i][j] = NULL;
+            }
         }
     }
 }
@@ -37,16 +41,32 @@ void grid_init(struct Node* grid[MAX_ROW][MAX_COL]){
 void print_grid(struct Node* grid[MAX_ROW][MAX_COL]){
     for(uint8_t i = 0; i < MAX_ROW; i++){
         for(uint8_t j = 0; j < MAX_COL; j++){
-            printf("%s", (grid[i][j]->is_walled & NORTH) ? "----" : "    ");
+            if(grid[i][j] != NULL){
+                printf("%s", (grid[i][j]->is_walled & NORTH) ? "----" : "    ");
+            }
+            else{
+                printf("    ");
+            }
+
         }
         printf("\n");
         for(uint8_t j = 0; j < MAX_COL; j++){
-            printf("%c%d%d%c", (grid[i][j]->is_walled & WEST) ? '|' : ' ', grid[i][j]->location.x, grid[i][j]->location.y, (grid[i][j]->is_walled & EAST) ? '|' : ' ');
+            if(grid[i][j] != NULL){
+                printf("%c%d%d%c", (grid[i][j]->is_walled & WEST) ? '|' : ' ', grid[i][j]->location.x, grid[i][j]->location.y, (grid[i][j]->is_walled & EAST) ? '|' : ' ');
+            }
+            else{
+                printf(" -- ");
+            }
         }
         printf("\n");
         if(i == MAX_ROW-1){
             for(uint8_t j = 0; j < MAX_COL; j++){
-                printf("%s", (grid[i][j]->is_walled & SOUTH) ? "----" : "    ");
+                if(grid[i][j] != NULL){
+                    printf("%s", (grid[i][j]->is_walled & SOUTH) ? "----" : "    ");
+                }
+                else{
+                    printf("    ");
+                }
             }
             printf("\n");
         }

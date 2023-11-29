@@ -25,10 +25,10 @@ void mapping_task(void* params)
         {
             enabled = true;
             print_grid(car->grid);
-            discover_map(car->grid, car->position);
+            discover_map(car->grid, car->position, car->explored_grid);
 
             xMessageBufferSend(
-                *(car->components[MAPPING]->buffer),
+                *(car->components[PATHFINDING]->buffer),
                 (void*)&enabled,
                 sizeof(enabled),
                 portMAX_DELAY
@@ -123,11 +123,12 @@ struct LinkedList* generate_path_to_node(struct Node* start_node, struct Node* e
 void visit_node(struct Node** car_position, struct Node* node_to_visit){
     struct LinkedList* path_to_node = generate_path_to_node(*car_position, node_to_visit);
     struct Node* starting_node = remove_at_head(path_to_node);
+    printf("----------------------------------------------------------------------------------------------------\n");
+    printf("Currently at: (%d,%d). Goal: (%d,%d)\n", starting_node->location.x, starting_node->location.y, node_to_visit->location.x, node_to_visit->location.y);
 
     while(!isEmpty(path_to_node)){
         struct Node* next_node = remove_at_head(path_to_node);
-        printf("Goal: (%d,%d), traversing from (%d,%d) to (%d,%d)\n",node_to_visit->location.x, node_to_visit->location.y, (*car_position)->location.x, (*car_position)->location.y, next_node->location.x, next_node->location.y);
-        *car_position = next_node;
+        printf("Traversing from (%d,%d) to (%d,%d)\n", (*car_position)->location.x, (*car_position)->location.y, next_node->location.x, next_node->location.y);        *car_position = next_node;
     }
 
     free(path_to_node);
@@ -143,7 +144,7 @@ void visit_node(struct Node** car_position, struct Node* node_to_visit){
  * Arguments: Map grid, and the current car's position.
  * Returns: void
  */
-void discover_map(struct Node* grid[MAX_ROW][MAX_COL], struct Node** car_position){
+void discover_map(struct Node* grid[MAX_ROW][MAX_COL], struct Node** car_position, struct Node* explored_grid[MAX_ROW][MAX_COL]){
     struct LinkedList* stack = (struct LinkedList*)malloc(sizeof(struct LinkedList));
     ll_init(stack);
 
@@ -155,6 +156,7 @@ void discover_map(struct Node* grid[MAX_ROW][MAX_COL], struct Node** car_positio
         node_to_visit->marked = true;
 
         visit_node(car_position, node_to_visit);
+        explored_grid[node_to_visit->location.x][node_to_visit->location.y] = node_to_visit;
 
         // TODO: Check neighbours for walls, then send the wall data to the mapping message buffer.
 
@@ -205,6 +207,8 @@ void discover_map(struct Node* grid[MAX_ROW][MAX_COL], struct Node** car_positio
                 node_to_visit->is_walled &= ~mask;
             }
         }
+
+        print_grid(explored_grid);
     }
 
     printf("Successfully mapped the maze.\n");

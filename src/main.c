@@ -512,31 +512,33 @@ void init_wifi()
 int main()
 {
     stdio_init_all();
-    init_wifi();
+    //init_wifi();
 
     sleep_ms(5000);
 
     struct Car *car = (struct Car *)malloc(sizeof(struct Car));
     car_init(car);
     global_car = car;
-    grid_init(car->grid);
+    grid_init(car->grid, false);
+    grid_init(car->explored_grid, true);
     components_init(car->components);
 
     car->position = (struct Node **)malloc(sizeof(struct Node *));
     *(car->position) = car->grid[START_NODE_X][START_NODE_Y];
 
-    add_wall(car->grid, car->grid[3][3], SOUTH | EAST);
-    add_wall(car->grid, car->grid[2][3], EAST | WEST);
-    add_wall(car->grid, car->grid[1][3], EAST | WEST);
-    add_wall(car->grid, car->grid[0][3], WEST);
-    add_wall(car->grid, car->grid[3][2], WEST | SOUTH);
-    add_wall(car->grid, car->grid[2][2], WEST);
-    add_wall(car->grid, car->grid[1][2], WEST);
-    add_wall(car->grid, car->grid[0][3], WEST);
-    add_wall(car->grid, car->grid[0][1], WEST);
-    add_wall(car->grid, car->grid[1][1], WEST);
-    add_wall(car->grid, car->grid[2][1], WEST);
+    add_wall(car->grid, car->grid[0][0], EAST);
+    add_wall(car->grid, car->grid[3][0], EAST);
+    add_wall(car->grid, car->grid[2][1], NORTH | EAST | SOUTH);
     add_wall(car->grid, car->grid[3][1], WEST);
+    add_wall(car->grid, car->grid[0][2], SOUTH);
+    add_wall(car->grid, car->grid[1][2], EAST);
+    add_wall(car->grid, car->grid[2][2], EAST);
+    add_wall(car->grid, car->grid[3][2], EAST);
+    add_wall(car->grid, car->grid[1][3], EAST);
+    add_wall(car->grid, car->grid[2][3], EAST);
+    add_wall(car->grid, car->grid[3][3], EAST);
+    add_wall(car->grid, car->grid[1][4], NORTH | SOUTH);
+    add_wall(car->grid, car->grid[2][5], SOUTH);
 
     vLaunch(car);
 }
