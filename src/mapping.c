@@ -25,7 +25,7 @@ void mapping_task(void* params)
         {
             enabled = true;
             print_grid(car->grid);
-            discover_map(car->grid, car->position, car->explored_grid);
+            discover_map(car->grid, car->position, car->explored_grid, car->entrance_node, car->exit_node);
 
             xMessageBufferSend(
                 *(car->components[PATHFINDING]->buffer),
@@ -144,11 +144,11 @@ void visit_node(struct Node** car_position, struct Node* node_to_visit){
  * Arguments: Map grid, and the current car's position.
  * Returns: void
  */
-void discover_map(struct Node* grid[MAX_ROW][MAX_COL], struct Node** car_position, struct Node* explored_grid[MAX_ROW][MAX_COL]){
+void discover_map(struct Node* grid[MAX_ROW][MAX_COL], struct Node** car_position, struct Node* explored_grid[MAX_ROW][MAX_COL], struct Node** entrance_node, struct Node** exit_node){
     struct LinkedList* stack = (struct LinkedList*)malloc(sizeof(struct LinkedList));
     ll_init(stack);
 
-    insertAtHead(stack, grid[START_NODE_X][START_NODE_Y]);
+    insertAtHead(stack, *(car_position));
     
     while(!isEmpty(stack)){
 
@@ -202,6 +202,22 @@ void discover_map(struct Node* grid[MAX_ROW][MAX_COL], struct Node** car_positio
                     // parent this node to our current node, since to get to this node, you need to come from my current node
                     neighbour_node->parent = node_to_visit;
                     insertAtHead(stack, neighbour_node);
+                }
+                else if(pos_x >= MAX_ROW || pos_y >= MAX_COL){
+                    // if(*(entrance_node) != NULL){
+                    //     *(exit_node) = node_to_visit;
+                    // }
+                    // else{
+                    //     *(entrance_node) = node_to_visit;
+                    // }
+                    if(node_to_visit == grid[START_NODE_X][START_NODE_Y]){
+                        *(entrance_node) = node_to_visit;
+                        printf("Maze Entrance at (%d, %d)\n", node_to_visit->location.x, node_to_visit->location.y);
+                    }
+                    else{
+                        *(exit_node) = node_to_visit;
+                        printf("Maze Exit at (%d, %d)\n", node_to_visit->location.x, node_to_visit->location.y);
+                    }
                 }
 
                 node_to_visit->is_walled &= ~mask;

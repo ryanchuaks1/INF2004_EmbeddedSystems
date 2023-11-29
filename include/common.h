@@ -61,6 +61,8 @@ struct Component{
 
 struct Car{
     struct Node** position;
+    struct Node** entrance_node;
+    struct Node** exit_node;
     enum PID_STATE* state;
     struct Node* grid[MAX_ROW][MAX_COL];
     struct Node* explored_grid[MAX_ROW][MAX_COL];

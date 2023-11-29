@@ -29,7 +29,7 @@ void pathfinding_task(void* params){
 
         if (enabled)
         {
-            struct LinkedList *path = compute_path(car->grid, car->grid[START_NODE_X][START_NODE_Y], car->grid[END_NODE_X][END_NODE_Y]);
+            struct LinkedList *path = compute_path(car->grid, *(car->entrance_node), *(car->exit_node));
             if (path != NULL)
             {
                 //print_ll(path);

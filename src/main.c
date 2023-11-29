@@ -526,6 +526,12 @@ int main()
     car->position = (struct Node **)malloc(sizeof(struct Node *));
     *(car->position) = car->grid[START_NODE_X][START_NODE_Y];
 
+    car->entrance_node = (struct Node **)malloc(sizeof(struct Node *));
+    *(car->entrance_node) = NULL;
+
+    car->exit_node = (struct Node **)malloc(sizeof(struct Node *));
+    *(car->exit_node) = NULL;
+
     add_wall(car->grid, car->grid[0][0], EAST);
     add_wall(car->grid, car->grid[3][0], EAST);
     add_wall(car->grid, car->grid[2][1], NORTH | EAST | SOUTH);
