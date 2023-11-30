@@ -41,8 +41,9 @@ Task with the same priority does round robin however, higher priority task will 
 
 The Proposals, Block Diagram and Flow Chars are in the "diagrams_and_proposal" Folder.
 
+## Functions/Methods
+
 linkedlist.c:
-Functions/Methods:
 1. insertAtHead: Inserts a node into the head of the linkedlist
 2. insertAtTail: Inserts a node into the tail of the linkedlist
 3. remove_at_head: Removes a node from the head of the linkedlist
