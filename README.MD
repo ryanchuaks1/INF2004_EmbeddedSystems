@@ -43,7 +43,7 @@ The Proposals, Block Diagram and Flow Chars are in the "diagrams_and_proposal" F
 
 ## Functions/Methods
 
-linkedlist.c:
+linkedlist.c
 1. insertAtHead: Inserts a node into the head of the linkedlist
 2. insertAtTail: Inserts a node into the tail of the linkedlist
 3. remove_at_head: Removes a node from the head of the linkedlist
@@ -55,7 +55,7 @@ linkedlist.c:
 9. ll_init: Initializes the linkedlist
 10. print_ll: Prints the content of the linkedlist (A*)
 
-mapping.c:
+mapping.c
 1. mapping_task: FreeRTOS task for mapping
 2. lowest_common_ancestor: Recursive function, aims to find the intersecting node between 2 paths that lead to the entrance node
 3. generate_path_to_node: Generates a path from the starting node, to the destination node.
@@ -75,7 +75,7 @@ pathfinding.c
 6. pathfinding_task: Waits for the mapping algorithm to finish discovering the map, then use A* pathfinding to find the shortest path
 7. print_pathfinding_grid: Prints the shortest path from entrance to exit, in the map.
 
-grid.c:
+grid.c
 1. grid_init: After memory is allocated to the grid, initializes it by initializing every node in the grid as well
 2. print_grid: Prints the grid of the map
 3. add_wall: This function is called when a wall needs to be added on the node. If you add a west wall on the node, then the neighbouring left node's east wall also needs to be added.
