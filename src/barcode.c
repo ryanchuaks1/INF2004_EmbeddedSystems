@@ -256,7 +256,7 @@ void decode_barcode(int black_bar_times[], int white_bar_times[])
  * barcode_to_char()
  * --------
  * Purpose: Convert the Barcode to Character based on the Black and White bar array data from decode_barcode
- *          Coded the logic using the Code 39 Characters from https://en.m.wikipedia.org/wiki/Code_39 
+ *          Coded the logic using the reference from https://en.m.wikipedia.org/wiki/Code_39 
  * Arguments: black_bar_times[], white_bar_times[]
  * Return: None
  */

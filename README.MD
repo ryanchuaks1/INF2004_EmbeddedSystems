@@ -138,6 +138,6 @@ The main branch is the official branch for this project, the other branches are 
 4. **alarm_callback**: This alarm_callback tells the PID that there is a wall ahead instead of a barcode
 5. **check_if_wall**: This functions checks if the Black line detected by the Barcode IR sensor is a Black Wall or a Barcode
 6. **decode_barcode**: Decode the barcode base on the Black and White bar array time data when reading the barcode
-7. **barcode_to_char**: Convert the Barcode to Character based on the Black and White bar array data from decode_barcode. Coded the logic using the Code 39 Characters from https://en.m.wikipedia.org/wiki/Code_39
+7. **barcode_to_char**: Convert the Barcode to Character based on the Black and White bar array data from decode_barcode. Coded the logic using the reference from https://en.m.wikipedia.org/wiki/Code_39
 8. **read_barcode**: To read the Barcode. The Thickness of the barcode is measured using Time. For Independent Testing.
 
