@@ -8,7 +8,7 @@
 /*
  * mapping_task()
  * ---------------------
- * Purpose: Waits for the mapping algorithm to finish discovering the map, then use A* pathfinding to find the shortest path
+ * Purpose: Discovers the map, then alert the Pathfinding task
  * Arguments: car struct
  * Returns: void
  */

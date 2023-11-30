@@ -10,7 +10,7 @@
  * ---------------------
  * Purpose: After memory is allocated to the grid, initializes it by initializing every node in the grid as well
  * Reason: This is because each grid only stores the address to the node, hence malloc() for the grid does not allocate memory to the struct itself.
- * Arguments: Map grid
+ * Arguments: Map grid and whether you're printing the actual map or the discovery map.
  * Returns: void
  */
 void grid_init(struct Node* grid[MAX_ROW][MAX_COL], bool exploring){
@@ -37,6 +37,14 @@ void grid_init(struct Node* grid[MAX_ROW][MAX_COL], bool exploring){
         }
     }
 }
+
+/*
+ * print_grid()
+ * ---------------------
+ * Purpose: Prints the grid of the map
+ * Arguments: The grid
+ * Returns: void
+ */
 
 void print_grid(struct Node* grid[MAX_ROW][MAX_COL]){
     for(uint8_t i = 0; i < MAX_ROW; i++){

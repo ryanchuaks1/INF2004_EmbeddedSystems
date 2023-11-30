@@ -5,6 +5,13 @@
 
 #include "../include/mapping.h"
 
+/*
+ * insertAtHead()
+ * ---------------------
+ * Purpose: Inserts a node at the head of the linkedlist
+ * Arguments: LinkedList and the new node to be added
+ * Returns: void
+ */
 void insertAtHead(struct LinkedList* ll, struct Node* newNode){
     struct Node* currHead = (*ll).head;
     if(currHead != NULL){
@@ -17,6 +24,13 @@ void insertAtHead(struct LinkedList* ll, struct Node* newNode){
     (*ll).head = newNode; //get the actual LL struct, then store the struct Node address value into the head variable.
 }
 
+/*
+ * insertAtTail()
+ * ---------------------
+ * Purpose: Inserts a node at the tail of the linkedlist
+ * Arguments: LinkedList and the new node to be added
+ * Returns: void
+ */
 void insertAtTail(struct LinkedList* ll, struct Node* newNode){
     struct Node* currTail = (*ll).tail;
     if(currTail != NULL){
@@ -157,6 +171,13 @@ struct Node* find_mid_node(struct Node* head_node){
     return mid_node;
 }
 
+/*
+ * size()
+ * ---------------------
+ * Purpose: Returns the size of the linkedlist
+ * Arguments: LinkedList
+ * Returns: size (int)
+ */
 int size(struct LinkedList* ll){
     int counter = 0;
     struct Node* currNode = (*ll).head;
@@ -167,6 +188,13 @@ int size(struct LinkedList* ll){
     return counter;
 }
 
+/*
+ * isEmpty()
+ * ---------------------
+ * Purpose: Checks if a linkedlist is empty
+ * Arguments: LinkedList
+ * Returns: true if empty, false if not empty
+ */
 bool isEmpty(struct LinkedList* ll){
     return (*ll).head == NULL;
 }
@@ -189,6 +217,13 @@ void ll_init(struct LinkedList* ll){
     }
 }
 
+/*
+ * print_ll()
+ * ---------------------
+ * Purpose: Prints the content of the linkedlist (for A*)
+ * Arguments: LinkedList
+ * Returns: void
+ */
 void print_ll(struct LinkedList* ll){
     struct Node* curr_node = ll->head;
     int counter = 1;
