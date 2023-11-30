@@ -23,7 +23,7 @@ void barcode_task(void *params)
 
     while (true)
     {
-        //Wait to receive from the message from the PID to measure the barcode
+        //Wait to receive from the message from the PID controller to measure the barcode
         xMessageBufferReceive
         (
             *(car->components[BARCODE]->buffer),
@@ -72,7 +72,7 @@ void barcode_task(void *params)
             vTaskDelay(pdMS_TO_TICKS(10));
         }
 
-        // Tell the PID that the barcode has been sent
+        // Tell the PID controller that the barcode has been sent
         xMessageBufferSend
         (
             *(car->main_buffer),
@@ -126,7 +126,7 @@ void barcode_init()
 /**
  * alarm_callback()
  * --------
- * Purpose: This alarm_callback tells the PID that there is a wall ahead instead of a barcode
+ * Purpose: This alarm_callback tells the PID controller that there is a wall ahead instead of a barcode
  * Arguments: None
  * Return: None
  */
@@ -158,7 +158,7 @@ void check_if_wall()
         barcodeFlags.count++;
         last_button_press_time = time_us_64(); // update last button press time
         last_wall_time = time_us_64();         // update last wall time
-        add_alarm_in_ms(500, (alarm_callback_t)alarm_callback, NULL, false); //Call the alarm_callback to tell the PID that it is a wall
+        add_alarm_in_ms(500, (alarm_callback_t)alarm_callback, NULL, false); //Call the alarm_callback to tell the PID controller that it is a wall
 
         if (barcodeFlags.count > 1) // When wall is detected
         {
