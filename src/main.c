@@ -532,19 +532,31 @@ int main()
     car->exit_node = (struct Node **)malloc(sizeof(struct Node *));
     *(car->exit_node) = NULL;
 
-    add_wall(car->grid, car->grid[0][0], EAST);
-    add_wall(car->grid, car->grid[3][0], EAST);
-    add_wall(car->grid, car->grid[2][1], NORTH | EAST | SOUTH);
-    add_wall(car->grid, car->grid[3][1], WEST);
+    // add_wall(car->grid, car->grid[0][0], EAST);
+    // add_wall(car->grid, car->grid[3][0], EAST);
+    // add_wall(car->grid, car->grid[2][1], NORTH | EAST | SOUTH);
+    // add_wall(car->grid, car->grid[3][1], WEST);
+    // add_wall(car->grid, car->grid[0][2], SOUTH);
+    // add_wall(car->grid, car->grid[1][2], EAST);
+    // add_wall(car->grid, car->grid[2][2], EAST);
+    // add_wall(car->grid, car->grid[3][2], EAST);
+    // add_wall(car->grid, car->grid[1][3], EAST);
+    // add_wall(car->grid, car->grid[2][3], EAST);
+    // add_wall(car->grid, car->grid[3][3], EAST);
+    // add_wall(car->grid, car->grid[1][4], NORTH | SOUTH);
+    // add_wall(car->grid, car->grid[2][5], SOUTH);
+    add_wall(car->grid, car->grid[3][1], NORTH);
+    add_wall(car->grid, car->grid[2][2], NORTH | SOUTH);
+    add_wall(car->grid, car->grid[2][3], NORTH | SOUTH);
+    add_wall(car->grid, car->grid[2][4], NORTH | SOUTH);
+    add_wall(car->grid, car->grid[2][1], NORTH);
+    add_wall(car->grid, car->grid[0][1], SOUTH);
     add_wall(car->grid, car->grid[0][2], SOUTH);
-    add_wall(car->grid, car->grid[1][2], EAST);
-    add_wall(car->grid, car->grid[2][2], EAST);
-    add_wall(car->grid, car->grid[3][2], EAST);
-    add_wall(car->grid, car->grid[1][3], EAST);
-    add_wall(car->grid, car->grid[2][3], EAST);
-    add_wall(car->grid, car->grid[3][3], EAST);
-    add_wall(car->grid, car->grid[1][4], NORTH | SOUTH);
-    add_wall(car->grid, car->grid[2][5], SOUTH);
+    add_wall(car->grid, car->grid[0][3], SOUTH);
+    add_wall(car->grid, car->grid[0][4], SOUTH);
+    add_wall(car->grid, car->grid[1][0], EAST);
+    add_wall(car->grid, car->grid[1][5], WEST);
+    add_wall(car->grid, car->grid[2][0], EAST);
 
     vLaunch(car);
 }
