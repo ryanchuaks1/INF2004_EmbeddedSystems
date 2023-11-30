@@ -9,7 +9,7 @@
 /**
  * barcode_task()
  * --------
- * Purpose: VTask for IR Sensor Sensing the Barcode to be ran by freeRtos.
+ * Purpose: VTask for IR Sensor Sensing the Barcode to be ran by FreeRTOS.
  *          Task runs and read the Barcode
  * Arguments: VTask Parameters
  * Return: None

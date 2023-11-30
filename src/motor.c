@@ -8,7 +8,7 @@
 /**
  * motor_task()
  * --------
- * Purpose: VTask for motor to be ran by freeRtos.
+ * Purpose: vTask for motor to be ran by FreeRTOS.
  *          Initialises the l298n
  *          Runs anything in the while loop
  * Arguments: params from vTask

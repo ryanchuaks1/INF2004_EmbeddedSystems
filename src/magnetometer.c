@@ -7,7 +7,7 @@
 /**
  * magnetometer_task()
  * --------
- * Purpose: VTask to be ran by freeRtos.
+ * Purpose: vTask to be ran by FreeRTOS.
  *          Initialises the magnometer
  *          Reads the magnometer every 2 seconds depending on the direction facing
  *          Accelerometer not used

@@ -11,7 +11,7 @@ uint16_t right_rising_edge_count;
 /**
  * wheel_encoder_task()
  * --------
- * Purpose: VTask for wheel encoders to be ran by freeRtos.
+ * Purpose: vTask for wheel encoders to be ran by FreeRTOS.
  *          Initialises the encoders
  * Arguments: params from vTask
  * Return: 1 as completed

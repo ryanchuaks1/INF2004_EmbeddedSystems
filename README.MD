@@ -100,7 +100,7 @@ The main branch is the official branch for this project, the other branches are 
 6. **ir_sensor_disable**: Disable the IR Sensor to stop sensing
 
 ### magnetometer.c
-1. **magnetometer_task**: VTask to be ran by freeRtos. Initialises the magnometer. Reads the magnometer every 2 seconds depending on the direction facing
+1. **magnetometer_task**: vTask to be ran by FreeRTOS. Initialises the magnometer. Reads the magnometer every 2 seconds depending on the direction facing
 2. **i2c_init_pins**: Initializes I2C Pins
 3. **magnetometer_init**: Initializes the magnetometer. Further Code explanation in the function
 4. **accelerometer_init**: Initializes the accelerometer
@@ -110,7 +110,7 @@ The main branch is the official branch for this project, the other branches are 
 8. **calculate_angle**: Using the Arctangent function formula to calculate the angle
 
 ### motor.c
-1. **motor_task**: VTask for motor to be ran by freeRtos. Initialises the l298n. Runs anything in the while loop
+1. **motor_task**: vTask for motor to be ran by FreeRTOS. Initialises the l298n. Runs anything in the while loop
 2. **l298n_speed_pwm_setup**: Set up the PWM pins and the GPIO pins to control the direction using the L298N
 3. **set_speed**: Set the speed using the PWM for the car to move. This function makes the car start
 4. **set_direction**: Set the Direction of the car base on the DORECTION Enum. Useful for functions using the enum Uses a Swtch case statement
@@ -127,15 +127,15 @@ The main branch is the official branch for this project, the other branches are 
 4. **ultrasonic_task**: Task used to Run the Ultrasonic
 
 ### wheel_encoder.c
-1. **wheel_encoder_task**: VTask for wheel encoders to be ran by freeRtos. Initialises the encoders.
+1. **wheel_encoder_task**: vTask for wheel encoders to be ran by FreeRTOS. Initialises the encoders.
 2. **wheel_encoder_init**: Initializes the Wheel Encoder Pins. Sets the number of rising edges for each encoder to 0
 3. **read_speed**: Reads the speed between the start and the end time. Distance between the time intervals are calculated and added to total distances
 
 ### barcode.c
-1. **barcode_task**: VTask for IR Sensor Sensing the Barcode to be ran by freeRtos. Task runs and reads the Barcode.
+1. **barcode_task**: vTask for IR Sensor Sensing the Barcode to be ran by FreeRTOS. Task runs and reads the Barcode.
 2. **reset_barcode_params**: Reset all parameters and flags of the barcode task
 3. **barcode_init**: Initialises all the pins for the Barcode IR Sensor
-4. **alarm_callback**: This alarm_callback tells the PID that there is a wall ahead instead of a barcode
+4. **alarm_callback**: This alarm_callback tells the PID controller that there is a wall ahead instead of a barcode
 5. **check_if_wall**: This functions checks if the Black line detected by the Barcode IR sensor is a Black Wall or a Barcode
 6. **decode_barcode**: Decode the barcode base on the Black and White bar array time data when reading the barcode
 7. **barcode_to_char**: Convert the Barcode to Character based on the Black and White bar array data from decode_barcode. Coded the logic using the reference from https://en.m.wikipedia.org/wiki/Code_39
