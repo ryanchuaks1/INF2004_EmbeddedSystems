@@ -84,7 +84,7 @@ void sensor_measure(struct repeating_timer *t){
 /**
  * ir_sensor_init()
  * --------
- * Purpose: initialise the pins for IR sensing
+ * Purpose: Initialise the pins for IR sensing
  * Arguments: Pin number
  * Return: None
  */

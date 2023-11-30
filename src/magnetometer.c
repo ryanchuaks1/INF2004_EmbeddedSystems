@@ -163,11 +163,10 @@ float read_angle_difference(float curr_heading)
 
 }
 
-// Using the Arctangent function formula to calculate
 /**
  * calculate_angle()
  * --------
- * Purpose: Using the Arctangent function formula to calculate
+ * Purpose: Using the Arctangent function formula to calculate the angle
  * Arguments: int16_t of the x and y axis
  * Return: the angle it is facing base on a compass
  */
