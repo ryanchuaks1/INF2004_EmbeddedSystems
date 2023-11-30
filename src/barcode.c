@@ -5,6 +5,15 @@
 
 #include "../include/barcode.h"
 
+
+/**
+ * barcode_task()
+ * --------
+ * Purpose: VTask for IR Sensor Sensing the Barcode to be ran by freeRtos.
+ *          Task runs and read the Barcode
+ * Arguments: VTask Parameters
+ * Return: None
+ */
 void barcode_task(void *params)
 {
     struct Car* car = (struct Car*)params;
@@ -14,6 +23,7 @@ void barcode_task(void *params)
 
     while (true)
     {
+        //Wait to receive from the message from the PID to measure the barcode
         xMessageBufferReceive
         (
             *(car->components[BARCODE]->buffer),
@@ -24,10 +34,6 @@ void barcode_task(void *params)
 
         printf("the opcode is: %d", opcode);
 
-        // if(opcode == BARCODE){
-
-        // }
-
         while (barcodeFlags.isBarcode)
         {
             uint16_t reading = adc_read();
@@ -35,19 +41,24 @@ void barcode_task(void *params)
 
             if (reading > BARCODE_THRESHOLD && !barcodeFlags.isPrevBlackBar)
             {
-                barcodeFlags.isPrevBlackBar = true;
-                int timing = time_us_64() - last_button_press_time;
-                black_bar_times[bar_index] = timing;
+                //If is Black and the previously bar is not black
+                //
+                barcodeFlags.isPrevBlackBar = true; // Set to prevBlack = true as currently is black
+                int timing = time_us_64() - last_button_press_time; // Measure the timing of the Black Bar
+                black_bar_times[bar_index] = timing; // Save the timing
             }
             else if (reading < BARCODE_THRESHOLD && barcodeFlags.isPrevBlackBar)
             {
-                barcodeFlags.isPrevBlackBar = false;
-                int timing = time_us_64() - last_button_press_time;
-                white_bar_times[bar_index] = timing;
-                bar_index++;
+                //If is white and the previous bar is Black
+                //
+                barcodeFlags.isPrevBlackBar = false; // Set to prevBlack = false as currently is white
+                int timing = time_us_64() - last_button_press_time; // Measure time of the White Bar
+                white_bar_times[bar_index] = timing; // Save the timing
+                bar_index++; //Increase the Index
             }
             if (white_bar_times[4] != 0)
             {
+                // When it reaches the end, decode the barcode
                 decode_barcode(black_bar_times, white_bar_times);
                 barcodeFlags.isPrevBlackBar = false;
                 white_bar_times[4] = 0;
@@ -55,12 +66,13 @@ void barcode_task(void *params)
             }
             if (barcodeFlags.limitter > BARCODE_CHAR_LIMIT)
             {
+                // Check if is the ending delimeter, if it is reset all paremeters
                 reset_barcode_params();
-                //vTaskDelete(NULL);
             }
             vTaskDelay(pdMS_TO_TICKS(10));
         }
 
+        // Tell the PID that the barcode has been sent
         xMessageBufferSend
         (
             *(car->main_buffer),
@@ -73,6 +85,13 @@ void barcode_task(void *params)
     }
 }
 
+/**
+ * reset_barcode_params()
+ * --------
+ * Purpose: Reset all parameters and flags of the barcode task
+ * Arguments: None
+ * Return: None
+ */
 void reset_barcode_params()
 {
     barcodeFlags.isPrevBlackBar = false;
@@ -84,6 +103,13 @@ void reset_barcode_params()
     gpio_set_irq_enabled_with_callback(WALL_SENSOR_PIN, GPIO_IRQ_EDGE_RISE, true, &interrupt_callback); // enable rising edge interrupt
 }
 
+/**
+ * barcode_init()
+ * --------
+ * Purpose: Initialises all the pins for the Barcode IR Sensor
+ * Arguments: None
+ * Return: None
+ */
 void barcode_init()
 {
     printf("initializing barcode\n");
@@ -97,6 +123,13 @@ void barcode_init()
     gpio_set_irq_enabled_with_callback(WALL_SENSOR_PIN, GPIO_IRQ_EDGE_RISE, true, &interrupt_callback); // enable rising edge interrupt
 }
 
+/**
+ * alarm_callback()
+ * --------
+ * Purpose: This alarm_callback tells the PID that there is a wall ahead instead of a barcode
+ * Arguments: None
+ * Return: None
+ */
 void alarm_callback()
 {
     if (barcodeFlags.isBarcode == false)
@@ -111,6 +144,13 @@ void alarm_callback()
     }
 }
 
+/**
+ * check_if_wall()
+ * --------
+ * Purpose: This functions checks if the Black line detected by the Barcode IR sensor is a Black Wall or a Barcode
+ * Arguments: None
+ * Return: None
+ */
 void check_if_wall()
 {
     if (time_us_64() - last_button_press_time > DEBOUNCE_DELAY_MS * 1000)
@@ -118,7 +158,7 @@ void check_if_wall()
         barcodeFlags.count++;
         last_button_press_time = time_us_64(); // update last button press time
         last_wall_time = time_us_64();         // update last wall time
-        add_alarm_in_ms(500, (alarm_callback_t)alarm_callback, NULL, false);
+        add_alarm_in_ms(500, (alarm_callback_t)alarm_callback, NULL, false); //Call the alarm_callback to tell the PID that it is a wall
 
         if (barcodeFlags.count > 1) // When wall is detected
         {
@@ -126,26 +166,18 @@ void check_if_wall()
             gpio_set_irq_enabled_with_callback(WALL_SENSOR_PIN, GPIO_IRQ_EDGE_RISE, false, &interrupt_callback); // enable rising edge interrupt
             barcodeFlags.isBarcode = true;
 
-            // uint8_t message = BARCODE;
-            // xMessageBufferSend(
-            //     *(global_car->main_buffer),
-            //     (void *)&message,
-            //     sizeof(message),
-            //     portMAX_DELAY
-            // );
-
             printf("Barcode Detected please reverse robot\n");
-            // TODO: Tell main to stop motors and reverse
-            // init_read_barcode();
         }
     }
 }
 
-// void init_read_barcode()
-// {
-//     xTaskCreate(read_barcode, "read_barcode", 1024, NULL, 1, NULL);
-// }
-
+/**
+ * decode_barcode()
+ * --------
+ * Purpose: Decode the barcode base on the Black and White bar array data from read_barcode
+ * Arguments: black_bar_times[], white_bar_times[]
+ * Return: None
+ */
 void decode_barcode(int black_bar_times[], int white_bar_times[])
 {
     int dec_black_bar_times[] = {0, 0, 0, 0, 0}; // Array for black bar times
@@ -220,6 +252,14 @@ void decode_barcode(int black_bar_times[], int white_bar_times[])
     barcode_to_char(dec_black_bar_times, dec_white_bar_times);
 }
 
+/**
+ * barcode_to_char()
+ * --------
+ * Purpose: Convert the Barcode to Character based on the Black and White bar array data from decode_barcode
+ *          Coded the logic using the Code 39 Characters from https://en.m.wikipedia.org/wiki/Code_39 
+ * Arguments: black_bar_times[], white_bar_times[]
+ * Return: None
+ */
 void barcode_to_char(int black_bar_times[], int white_bar_times[])
 {
     printf("Decoding barcode");
@@ -265,29 +305,41 @@ void barcode_to_char(int black_bar_times[], int white_bar_times[])
     printf("Decoded character: %c\n", decoded_char);
 }
 
+/**
+ * read_barcode()
+ * --------
+ * Purpose: To read the Barcode. The Thickness of the barcode is measured using Time. 
+ *          For Independent Testing, similiar to the code in the barcode_task
+ * Arguments: None
+ * Return: None
+ */
 void read_barcode()
 {
     vTaskDelay(pdMS_TO_TICKS(1000));
     while (barcodeFlags.isBarcode)
     {
         uint16_t reading = adc_read();
-        // printf("Reading: %d\n", reading);
 
         if (reading > BARCODE_THRESHOLD && !barcodeFlags.isPrevBlackBar)
         {
-            barcodeFlags.isPrevBlackBar = true;
-            int timing = time_us_64() - last_button_press_time;
-            black_bar_times[bar_index] = timing;
+            //If is Black and the previously bar is not black
+            //
+            barcodeFlags.isPrevBlackBar = true; // Set to prevBlack = true as currently is black
+            int timing = time_us_64() - last_button_press_time; // Mesure the timing of the Black Bar
+            black_bar_times[bar_index] = timing; // Save the timing
         }
         else if (reading < BARCODE_THRESHOLD && barcodeFlags.isPrevBlackBar)
         {
-            barcodeFlags.isPrevBlackBar = false;
-            int timing = time_us_64() - last_button_press_time;
-            white_bar_times[bar_index] = timing;
+            //If is white and the previous bar is Black
+            //
+            barcodeFlags.isPrevBlackBar = false; // Set to prevBlack = false as currently is white
+            int timing = time_us_64() - last_button_press_time; // Measure time of the White Bar
+            white_bar_times[bar_index] = timing; // Save the Timing
             bar_index++;
         }
         if (white_bar_times[4] != 0)
         {
+            // When it reaches the end, decode the barcode
             decode_barcode(black_bar_times, white_bar_times);
             barcodeFlags.isPrevBlackBar = false;
             white_bar_times[4] = 0;
@@ -295,6 +347,7 @@ void read_barcode()
         }
         if (barcodeFlags.limitter == 2)
         {
+            // Check if is the ending delimeter, if it is reset all paremeters
             reset_barcode_params();
             vTaskDelete(NULL);
         }
