@@ -86,12 +86,6 @@ The main branch is the official branch for this project, the other branches are 
 2. **print_grid**: Prints the grid of the map
 3. **add_wall**: This function is called when a wall needs to be added on the node. If you add a west wall on the node, then the neighbouring left node's east wall also needs to be added.
 
-### ultrasonic.c
-1. **measure_distance**: Measure the distance between the ultrasonic sensor and the object
-2. **ultrasonic_init**: Initializes the pins for ultrasonic
-3. **measure_ultrasonic**: Reads if there is an obstacle in front of the Ultrasonic. If there is, tell the PID to change to an OBJECT State.
-4. **ultrasonic_task**: Task used to Run the Ultrasonic
-
 ## Functions/Methods - Components
 
 ### interrupt.c
